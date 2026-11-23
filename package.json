@@ -12,6 +12,8 @@
     "test:build": "node scripts/verify-build.ts"
   },
   "dependencies": {
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
     "astro": "^7.4.13",
     "zod": "^4.6.7"
   },

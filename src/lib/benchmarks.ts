@@ -64,7 +64,21 @@ const benchmarkSchema = z.object({
   title: text,
   published: z.iso.date(),
   sections: z.array(sectionSchema).min(1),
-}).strict().refine(({ sections }) => new Set(sections.map(({ id }) => id)).size === sections.length, 'Section IDs must be unique');
+  spotlight: z.object({
+    title: text,
+    section: slug,
+    rows: z.array(z.number().int().nonnegative()).min(2),
+    description: text,
+  }).strict().optional(),
+}).strict()
+  .refine(({ sections }) => new Set(sections.map(({ id }) => id)).size === sections.length, 'Section IDs must be unique')
+  .refine(({ sections, spotlight }) => {
+    if (!spotlight) return true;
+    const result = sections.find(({ id }) => id === spotlight.section)?.result;
+    return result?.kind === 'live-solves' &&
+      new Set(spotlight.rows).size === spotlight.rows.length &&
+      spotlight.rows.every((index) => index < result.rows.length);
+  }, { path: ['spotlight'], message: 'Spotlight must reference distinct rows from a solve-rate section' });
 
 export type BenchmarkSet = z.infer<typeof benchmarkSchema>;
 export type BenchmarkSection = z.infer<typeof sectionSchema>;

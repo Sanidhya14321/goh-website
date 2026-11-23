@@ -67,6 +67,8 @@ test('reviewed benchmark files retain their own version and use coherent cohorts
   assert.equal(solveRate(20, 26), 77);
   seed.sections[0].result.rows[0].solved = 23;
   assert.throws(() => readBenchmarkSets({ [file]: seed }));
+  const wrongSpotlight = { ...next, spotlight: { ...next.spotlight, rows: [3, 99] } };
+  assert.throws(() => readBenchmarkSets({ [newFile]: wrongSpotlight }));
   next.sections = json(file).sections;
   next.sections[1].result.charts[0].columns = [1, 9];
   assert.throws(() => readBenchmarkSets({ [newFile]: next }));

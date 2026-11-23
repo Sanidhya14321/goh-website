@@ -1,0 +1,37 @@
+---
+import { solveRate, type BenchmarkSet } from '../lib/benchmarks';
+const { report } = Astro.props as { report: BenchmarkSet };
+const { spotlight } = report;
+const result = report.sections.find(({ id }) => id === spotlight?.section)?.result;
+const rows = spotlight && result?.kind === 'live-solves' ? spotlight.rows.map((index) => result.rows[index]) : [];
+---
+{spotlight && rows.length > 0 && (
+  <figure class="spotlight">
+    <figcaption>
+      <div>
+        <h2>{spotlight.title}</h2>
+        <p>{spotlight.description}</p>
+      </div>
+      <span>Share of attempts solved</span>
+    </figcaption>
+    <div class="spotlight-plot">
+      <div class="spotlight-ruler" aria-hidden="true">
+        {[0, 25, 50, 75, 100].map((value) => <span style={`--tick: ${value}%`}><span>{value}%</span></span>)}
+      </div>
+      <ul>
+        {rows.map(({ model, harness, attempts, solved }) => {
+          const rate = solveRate(solved, attempts);
+          return <li>
+            <div class="spotlight-label"><strong>{model}</strong><span>{harness}</span></div>
+            <div class="spotlight-track" style={`--share: ${rate}%`}>
+              <span class="spotlight-fill" aria-hidden="true"></span>
+              <span class="spotlight-rate">{rate}%</span>
+            </div>
+            <span class="spotlight-count">{solved} of {attempts} attempts</span>
+          </li>;
+        })}
+      </ul>
+    </div>
+    <a href={`#${report.id}-${spotlight.section}`}>See all solve rates</a>
+  </figure>
+)}

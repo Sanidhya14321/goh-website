@@ -1,6 +1,10 @@
 ---
 import Icon from '../components/Icon.astro';
 import { path, upstream } from '../lib/site';
+import '@fontsource/barlow/latin-400.css';
+import '@fontsource/barlow/latin-600.css';
+import '@fontsource/barlow/latin-700.css';
+import '@fontsource/barlow-condensed/latin-600.css';
 import '../styles/site.css';
 
 const { title, description, page } = Astro.props as { title: string; description: string; page: 'benchmarks' | 'downloads' };
@@ -11,7 +15,7 @@ const { title, description, page } = Astro.props as { title: string; description
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0b121b" />
+    <meta name="theme-color" content="#f7f8f5" />
     <link rel="icon" href={path('icon.svg')} type="image/svg+xml" />
     <title>{title}</title>
   </head>
@@ -27,7 +31,7 @@ const { title, description, page } = Astro.props as { title: string; description
         <a class="header-repo" href={upstream} aria-label="GoHarness on GitHub"><Icon name="github" size={19} /><span>GitHub</span></a>
       </div>
     </header>
-    <main id="main"><slot /></main>
+    <main id="main" tabindex="-1"><slot /></main>
     <footer class="site-footer">
       <div class="shell footer-inner">
         <a class="brand" href={path()}><span class="brand-mark"><Icon name="terminal" size={17} /></span>GoHarness</a>

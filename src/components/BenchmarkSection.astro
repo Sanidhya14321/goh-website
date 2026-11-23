@@ -7,9 +7,11 @@ const numeric = new Intl.NumberFormat('en-US');
 ---
 <section class="report-section" id={anchor} aria-labelledby={`${anchor}-title`}>
   <div class="report-heading">
-    <p class="eyebrow">{categoryLabels[result.kind]}</p>
-    <h4 id={`${anchor}-title`}>{section.title}</h4>
-    <p>{section.description}</p>
+    <div>
+      <h4 id={`${anchor}-title`}>{section.title}</h4>
+      <p>{section.description}</p>
+    </div>
+    <p class="measurement-type">{categoryLabels[result.kind].split(' · ')[0]}</p>
   </div>
   {result.kind === 'live-solves' ? (
     <>
@@ -17,7 +19,7 @@ const numeric = new Intl.NumberFormat('en-US');
         label: row.name, value: solveRate(row.solved, row.attempts), detail: `${row.solved}/${row.attempts} · ${row.model}`,
       }))} maximum={100} unit="%" endpoint="100%" />
       <div class="table-scroll" role="region" aria-labelledby={`${anchor}-caption`} tabindex="0">
-        <table>
+        <table class="solve-table">
           <caption id={`${anchor}-caption`}>Published results by run</caption>
           <thead><tr>{['Run', 'Harness', 'Model', 'Tasks', 'Attempts', 'Solved', 'False completions', 'Tool calls', 'Time (s)'].map((label) => <th scope="col">{label}</th>)}</tr></thead>
           <tbody>{result.rows.map((row) => (
@@ -49,7 +51,7 @@ const numeric = new Intl.NumberFormat('en-US');
   )}
   <details class="method">
     <summary>Methodology and sources</summary>
-    <div>
+    <div class="disclosure-content">
       <p>{section.methodology}</p>
       {section.note && <p>{section.note}</p>}
       <ul>{section.sources.map(({ url, label }) => <li><a href={url}>{label}</a></li>)}</ul>

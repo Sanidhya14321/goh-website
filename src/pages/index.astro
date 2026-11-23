@@ -2,7 +2,8 @@
 import Site from '../layouts/Site.astro';
 import BenchmarkSection from '../components/BenchmarkSection.astro';
 import Icon from '../components/Icon.astro';
-import { categoryLabels, readBenchmarkSets } from '../lib/benchmarks';
+import SolveSpotlight from '../components/SolveSpotlight.astro';
+import { readBenchmarkSets } from '../lib/benchmarks';
 import { path } from '../lib/site';
 
 const sets = readBenchmarkSets(import.meta.glob('../../data/benchmarks/*.json', { eager: true, import: 'default' }));
@@ -11,38 +12,27 @@ const published = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone
 const reportDate = (date: string) => published.format(new Date(date));
 ---
 <Site title="GoHarness Benchmarks" description="Published solve rates, token usage, and harness measurements for GoHarness, the local-first coding agent." page="benchmarks">
-  <section class="hero">
-    <div class="shell hero-grid">
-      <div>
-        <p class="eyebrow"><span class="status-dot"></span> Open-source coding agent</p>
-        <h1>GoHarness<br /><span>Benchmarks</span></h1>
-        <p class="hero-copy">GoHarness is a local-first coding agent written in Go. Use it in a terminal, in scripts, or from your editor.</p>
-        <div class="actions">
-          <a class="button primary" href={path('downloads/')}><Icon name="download" size={18} /> Desktop downloads</a>
-          <a class="button secondary" href="#benchmark-results">Explore results</a>
-        </div>
-      </div>
-      <aside class="report-index" aria-labelledby="report-index-title">
-        <div class="index-top"><span><Icon name="terminal" size={17} /> Benchmark report</span><time datetime={latest.published}>{reportDate(latest.published)}</time></div>
-        <div class="index-body">
-          <h2 id="report-index-title">{latest.title}</h2>
-          <ul>
-            {latest.sections.map((section) => <li><a href={`#${latest.id}-${section.id}`}><span>{section.title}</span><small>{categoryLabels[section.result.kind].split(' · ')[0]}</small></a></li>)}
-          </ul>
-        </div>
-      </aside>
+  <section class="shell overview">
+    <div class="overview-copy">
+      <h1>GoHarness<br />benchmarks</h1>
+      <p>GoHarness is a local-first coding agent written in Go. Run it in a terminal, in scripts, or from your editor.</p>
+      <a class="button primary" href={path('downloads/')}><Icon name="download" size={19} /> Desktop downloads</a>
     </div>
+    <SolveSpotlight report={latest} />
   </section>
   <div class="shell reports" id="benchmark-results">
-    <div class="section-intro">
-      <h2>Benchmark results</h2>
-      <p>Published measurements of task success, model usage, and harness performance.</p>
-    </div>
+    <h2 class="visually-hidden">Benchmark results</h2>
     {sets.length > 1 && <nav class="report-archive" aria-label="Benchmark reports">
       {sets.map((set) => <a href={`#${set.id}`}>{set.title}</a>)}
     </nav>}
     {sets.map((set) => <article class="benchmark-set" id={set.id} aria-labelledby={`${set.id}-title`}>
-      <header class="set-header"><h3 id={`${set.id}-title`}>{set.title}</h3><time datetime={set.published}>{reportDate(set.published)}</time></header>
+      <header class="set-header">
+        <h3 id={`${set.id}-title`}>{set.title}</h3>
+        <time datetime={set.published}>{reportDate(set.published)}</time>
+      </header>
+      <nav class="jump-nav" aria-label={`Sections in ${set.title}`}>
+        {set.sections.map((section) => <a href={`#${set.id}-${section.id}`}>{section.title}</a>)}
+      </nav>
       {set.sections.map((section) => <BenchmarkSection section={section} anchor={`${set.id}-${section.id}`} />)}
     </article>)}
   </div>

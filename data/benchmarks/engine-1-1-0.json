@@ -338,5 +338,14 @@
         ]
       }
     }
-  ]
+  ],
+  "spotlight": {
+    "title": "Real-project fixes",
+    "section": "solve-rates",
+    "rows": [
+      3,
+      4
+    ],
+    "description": "The same 19 Go tasks, with different models and harness builds."
+  }
 }
