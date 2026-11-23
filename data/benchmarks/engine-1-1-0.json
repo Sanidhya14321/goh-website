@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "id": "engine-1-1-0",
+  "title": "Engine benchmark report · v1.1.0",
+  "published": "2026-11-23",
+  "sections": [
+    {
+      "id": "solve-rates",
+      "title": "Solve rates",
+      "description": "Hidden regrades measured how often GoHarness solved each task. The chart shows the share of attempts solved in each run.",
+      "methodology": "Runs used the ChatGPT sign-in. The grader reapplied the agent’s changes to a clean starting tree, excluded test-file edits, and ran the hidden checks. A false completion is an attempt the agent reported as complete that failed the regrade.",
+      "sources": [
+        {
+          "label": "Published benchmark report",
+          "url": "https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/BENCHMARKS.md#results"
+        },
+        {
+          "label": "Grader and runner",
+          "url": "https://github.com/Sanidhya14321/goh/tree/913a9e995b49b0286d43a6da403eb42f9eab12b3/cmd/bench"
+        },
+        {
+          "label": "Task definitions",
+          "url": "https://github.com/Sanidhya14321/goh/tree/913a9e995b49b0286d43a6da403eb42f9eab12b3/bench/tasks"
+        }
+      ],
+      "result": {
+        "kind": "live-solves",
+        "grading": "An attempt counts as solved when hidden tests or a hidden answer check pass on a clean regrade.",
+        "rows": [
+          {
+            "name": "Basic",
+            "harness": "rc.156",
+            "model": "gpt-6.1-sol",
+            "taskCount": 22,
+            "taskNotes": "Go and Python bug fixes",
+            "attempts": 22,
+            "solved": 22,
+            "falseCompletions": 0,
+            "toolCalls": 6,
+            "seconds": 42
+          },
+          {
+            "name": "Hard",
+            "harness": "rc.156",
+            "model": "gpt-6.1-sol",
+            "taskCount": 10,
+            "taskNotes": "Symptom-described bugs",
+            "attempts": 26,
+            "solved": 25,
+            "falseCompletions": 1,
+            "toolCalls": 8.7,
+            "seconds": 59
+          },
+          {
+            "name": "Compound",
+            "harness": "rc.159",
+            "model": "gpt-6.1-sol",
+            "taskCount": 4,
+            "taskNotes": "Three bugs per task",
+            "attempts": 8,
+            "solved": 8,
+            "falseCompletions": 0,
+            "toolCalls": 20.9,
+            "seconds": 139
+          },
+          {
+            "name": "Real projects",
+            "harness": "rc.162",
+            "model": "gpt-6.1-sol",
+            "taskCount": 19,
+            "taskNotes": "Fixes from eight Go libraries",
+            "attempts": 19,
+            "solved": 14,
+            "falseCompletions": 5,
+            "toolCalls": 11.8,
+            "seconds": 77
+          },
+          {
+            "name": "Real projects",
+            "harness": "rc.180+",
+            "model": "gpt-6.2-sol",
+            "taskCount": 19,
+            "taskNotes": "Same fixes, completion check on/off",
+            "attempts": 26,
+            "solved": 20,
+            "falseCompletions": 6,
+            "toolCalls": 15.1,
+            "seconds": 122
+          },
+          {
+            "name": "Prompt range",
+            "harness": "1.1.0",
+            "model": "gpt-6.1-sol",
+            "taskCount": 7,
+            "taskNotes": "From “hello” to a 6,330-line file and an 85 KB log, across four builds",
+            "attempts": 56,
+            "solved": 56,
+            "falseCompletions": 0,
+            "toolCalls": 2.6,
+            "seconds": 14
+          },
+          {
+            "name": "Hard, before/after 1.1.0",
+            "harness": "1.1.0",
+            "model": "gpt-6.1-sol",
+            "taskCount": 6,
+            "taskNotes": "Hard bug fixes across comparison builds",
+            "attempts": 18,
+            "solved": 18,
+            "falseCompletions": 0,
+            "toolCalls": 10.3,
+            "seconds": 64
+          }
+        ]
+      }
+    },
+    {
+      "id": "token-efficiency",
+      "title": "Input tokens and latency",
+      "description": "The 1.1.0 before-and-after comparison used matched prompts. The values below are per attempt.",
+      "methodology": "Live gpt-6.1-sol via ChatGPT sign-in. The prompt-range comparison used two attempts per task per build and includes “hello” and the large-file fix. The six hard fixes use one attempt per task in each of the two compared builds. The solve-rate table includes runs from additional builds.",
+      "note": "The report identifies the after build as 1.1.0 and leaves the exact before-build revisions unspecified. Input tokens include the prompt and context sent to the model.",
+      "sources": [
+        {
+          "label": "Published benchmark report",
+          "url": "https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/BENCHMARKS.md#110-fewer-tokens-across-the-prompt-range"
+        },
+        {
+          "label": "Comparison script",
+          "url": "https://github.com/Sanidhya14321/goh/tree/913a9e995b49b0286d43a6da403eb42f9eab12b3/bench/tools/compare.py"
+        },
+        {
+          "label": "v1.1.0 verification log",
+          "url": "https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/development/VERIFICATION.md#110"
+        }
+      ],
+      "result": {
+        "kind": "live-efficiency",
+        "columnLabels": [
+          "Task cohort and metric",
+          "Before",
+          "After · 1.1.0"
+        ],
+        "rows": [
+          [
+            "“hello” · input tokens",
+            1350,
+            1222
+          ],
+          [
+            "“hello” · requests",
+            1,
+            1
+          ],
+          [
+            "6,330-line file fix · input tokens (thousands)",
+            28.5,
+            15.2
+          ],
+          [
+            "6,330-line file fix · requests",
+            10,
+            6.5
+          ],
+          [
+            "6,330-line file fix · time (s)",
+            61,
+            43
+          ],
+          [
+            "All 7 prompt-range tasks · input tokens (thousands)",
+            11.9,
+            9.8
+          ],
+          [
+            "All 7 prompt-range tasks · requests",
+            3.3,
+            2.8
+          ],
+          [
+            "All 7 prompt-range tasks · time (s)",
+            16,
+            13
+          ],
+          [
+            "6 hard bug fixes · input tokens (thousands)",
+            37,
+            20.2
+          ],
+          [
+            "6 hard bug fixes · tool calls",
+            10.7,
+            9
+          ],
+          [
+            "6 hard bug fixes · time (s)",
+            66,
+            57
+          ]
+        ],
+        "charts": [
+          {
+            "title": "All 7 prompt-range tasks · input tokens",
+            "unit": "k tokens",
+            "row": 5,
+            "columns": [
+              1,
+              2
+            ],
+            "decimals": 1
+          },
+          {
+            "title": "6 hard bug fixes · input tokens",
+            "unit": "k tokens",
+            "row": 8,
+            "columns": [
+              1,
+              2
+            ],
+            "decimals": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "loopback",
+      "title": "Request size across harnesses",
+      "description": "A local mock endpoint recorded what each harness sent for the example prompts.",
+      "methodology": "Loopback capture with no model inference or grading. Request sizes use the o200k_base tokenizer. System prompt sizes are in tokens, and tool counts are the number of tools offered.",
+      "note": "The report cites research/scripts/capture_harness_requests.py, which is outside the tagged source tree. The tagged report is the published record for these measurements. OpenCode also sent a separate 636-token title request.",
+      "sources": [
+        {
+          "label": "Published benchmark report",
+          "url": "https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/BENCHMARKS.md#other-harnesses"
+        },
+        {
+          "label": "v1.1.0 verification log",
+          "url": "https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/development/VERIFICATION.md#110"
+        }
+      ],
+      "result": {
+        "kind": "loopback",
+        "columnLabels": [
+          "Measure",
+          "GoHarness 1.1.0",
+          "OpenCode 1.19.5",
+          "Claude Code 2.1.330"
+        ],
+        "rows": [
+          [
+            "“hello” request · tokens",
+            2278,
+            7212,
+            12098
+          ],
+          [
+            "System prompt · tokens",
+            57,
+            2019,
+            1542
+          ],
+          [
+            "Tools offered",
+            17,
+            10,
+            12
+          ],
+          [
+            "Reading a 6,330-line file",
+            "Returns the file length and reading instructions",
+            "Lines 1–2,000 · 19,039 tokens",
+            "Lines 1–4,020 · 35,640 tokens"
+          ]
+        ],
+        "charts": [
+          {
+            "title": "“hello” request size",
+            "unit": "tokens",
+            "row": 0,
+            "columns": [
+              1,
+              2,
+              3
+            ],
+            "decimals": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "harness-speed",
+      "title": "Harness speed",
+      "description": "Startup, editing, search, rendering, and journal overhead measured on one Apple M5 Pro.",
+      "methodology": "Single-machine measurements without a model. The report describes Go package benchmarks and a 120×36 terminal for CLI startup. It does not specify exact builds for this section, an OpenCode version, or repetition counts.",
+      "sources": [
+        {
+          "label": "Published benchmark report",
+          "url": "https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/BENCHMARKS.md#harness-speed"
+        },
+        {
+          "label": "Tool microbenchmarks",
+          "url": "https://github.com/Sanidhya14321/goh/tree/913a9e995b49b0286d43a6da403eb42f9eab12b3/internal/tools/benchmark_test.go"
+        }
+      ],
+      "result": {
+        "kind": "machine",
+        "columnLabels": [
+          "Measure",
+          "GoHarness",
+          "OpenCode"
+        ],
+        "rows": [
+          [
+            "CLI startup to first prompt",
+            "39 ms · ~23 MB",
+            "1,400 ms · ~820 MB"
+          ],
+          [
+            "Search 128 files (2.4 MB)",
+            "7.9 ms",
+            "—"
+          ],
+          [
+            "Durable exact edit of a 114 KB file",
+            "8.7 ms",
+            "—"
+          ],
+          [
+            "Render a chat frame with a 120 KB transcript",
+            "0.2 ms",
+            "—"
+          ],
+          [
+            "Harness time in a three-request run",
+            "~80 ms of 11.6 s (journal writes)",
+            "—"
+          ]
+        ]
+      }
+    }
+  ]
+}

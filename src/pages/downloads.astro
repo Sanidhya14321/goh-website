@@ -1,0 +1,79 @@
+---
+import { readFile } from 'node:fs/promises';
+import Site from '../layouts/Site.astro';
+import Icon from '../components/Icon.astro';
+import { cliInstall, cliRelease } from '../lib/site';
+import { configSchema, packageLinks, packages, readCatalog } from '../lib/downloads';
+import catalogData from '../../data/downloads.json';
+import configData from '../../data/desktop-config.json';
+
+const config = configSchema.parse({ ...configData, repository: process.env.DESKTOP_RELEASE_REPO || configData.repository });
+const catalogOverride = process.env.GOH_DOWNLOAD_CATALOG;
+const catalog = readCatalog(catalogOverride ? JSON.parse(await readFile(catalogOverride, 'utf8')) : catalogData, config);
+const complete = catalog.status === 'complete';
+const platformInfo = [
+  { id: 'macos', name: 'macOS', instruction: 'Open the DMG, then drag GoHarness into Applications.' },
+  { id: 'ubuntu', name: 'Ubuntu', instruction: 'Open the DEB with your package installer, or install it with apt from the folder where you saved it.' },
+  { id: 'windows', name: 'Windows', instruction: 'Open the EXE installer and follow the setup prompts.' },
+] as const;
+const mib = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+---
+<Site title="Download GoHarness Desktop" description="Find GoHarness Desktop packages for macOS, Ubuntu, and Windows." page="downloads">
+  <section class="hero download-hero">
+    <div class="shell">
+      <p class="eyebrow"><span class="status-dot"></span> GoHarness Desktop</p>
+      <h1>Download<br /><span>GoHarness Desktop</span></h1>
+      <p class="hero-copy">Choose your operating system and processor architecture.</p>
+      <nav class="platform-nav" aria-label="Operating systems">
+        {platformInfo.map(({ id, name }) => <a class="button secondary" href={`#${id}`}><Icon name={id} size={17} />{name}</a>)}
+      </nav>
+    </div>
+  </section>
+  <div class="shell download-body">
+    <div class:list={['release-status', { ready: complete }]}>
+      <span class="status-dot"></span>
+      <div>
+        <strong>{complete ? 'Stable desktop packages available' : 'Desktop downloads unavailable'}</strong>
+        {catalog.status === 'absent' && <p>There is no public stable desktop release in the download catalog yet.</p>}
+        {catalog.status === 'partial' && <p>The latest stable release is missing required packages. Downloads will open when the release is complete.</p>}
+        {complete && <p>Each download button points to the latest stable release on GitHub.</p>}
+      </div>
+    </div>
+    <div class="platform-grid">
+      {platformInfo.map(({ id, name, instruction }) => (
+        <section class="platform-card" id={id} aria-labelledby={`${id}-title`}>
+          <span class="platform-icon"><Icon name={id} size={24} /></span>
+          <h2 id={`${id}-title`}>{name}</h2>
+          <ul class="package-list">
+            {packages.filter((item) => item.platform === id).map((item) => {
+              const asset = complete ? catalog.assets.find(({ variant }) => variant === item.id) : undefined;
+              const links = complete && asset ? packageLinks(catalog.repository, catalog.tag, item.name) : undefined;
+              return (
+                <li>
+                  <div class="package-title"><strong>{item.arch}</strong><span>{item.format}</span></div>
+                  {links && asset && complete ? (
+                    <>
+                      <a class="button primary package-button" href={links.latest} aria-label={`Download ${name} · ${item.arch}`}><Icon name="download" size={17} /> Download</a>
+                      <div class="asset-meta">
+                        <a href={links.pinned}>{catalog.tag} · {asset.bytes >= 1048576 ? `${mib.format(asset.bytes / 1048576)} MiB` : `${asset.bytes.toLocaleString('en-US')} bytes`}</a>
+                        {asset.digest && <details><summary>SHA-256</summary><code>{asset.digest.split(':')[1]}</code></details>}
+                      </div>
+                    </>
+                  ) : <span class="package-unavailable">{complete ? 'Unavailable in this release' : 'Unavailable'}</span>}
+                </li>
+              );
+            })}
+          </ul>
+          <div class="install"><h3>Install</h3><p>{instruction}</p>
+            {id === 'ubuntu' && <code class="install-command">sudo apt install ./goh-desktop-ubuntu-&lt;arch&gt;.deb</code>}
+          </div>
+        </section>
+      ))}
+    </div>
+    <aside class="cli-download">
+      <span class="platform-icon"><Icon name="terminal" size={25} /></span>
+      <div><h2>GoHarness CLI</h2><p>Use the terminal version of GoHarness on macOS, Linux, or Windows.</p></div>
+      <div class="cli-actions"><a class="button secondary" href={cliRelease}>CLI release assets</a><a href={cliInstall}>CLI install guide</a></div>
+    </aside>
+  </div>
+</Site>

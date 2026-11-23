@@ -1,0 +1,25 @@
+---
+const { title, values, maximum, unit, decimals = 0, endpoint, compact = false } = Astro.props as {
+  title: string;
+  values: { label: string; value: number; detail?: string }[];
+  maximum: number;
+  unit: string;
+  decimals?: number;
+  endpoint?: string;
+  compact?: boolean;
+};
+const format = new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+---
+<figure class:list={['chart', { compact }]}>
+  <figcaption>{title}</figcaption>
+  <ul class="bar-list">
+    {values.map(({ label, value, detail }, index) => (
+      <li>
+        <span class="bar-label">{label}{detail && <small>{detail}</small>}</span>
+        <span class="bar-track" aria-hidden="true"><span class:list={['bar-fill', { dim: compact && index === 0 }]} style={`width:${value / (maximum || 1) * 100}%`}></span></span>
+        <span class="bar-number">{format.format(value)}{unit === '%' ? unit : ` ${unit}`}</span>
+      </li>
+    ))}
+  </ul>
+  {endpoint && <div class="chart-axis" aria-hidden="true"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>{endpoint}</span></div>}
+</figure>

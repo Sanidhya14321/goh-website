@@ -1,0 +1,4 @@
+{
+  "repository": "Sanidhya14321/goh-desktop",
+  "requiredVariants": ["macos-universal", "ubuntu-amd64", "windows-amd64"]
+}

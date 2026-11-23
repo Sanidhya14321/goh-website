@@ -1,0 +1,44 @@
+{
+  "tag_name": "v2.3.4",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-11-23T10:00:00Z",
+  "assets": [
+    {
+      "name": "goh-desktop-macos-universal.dmg",
+      "size": 12000000,
+      "state": "uploaded",
+      "digest": "sha256:abababababababababababababababababababababababababababababababab"
+    },
+    {
+      "name": "goh-desktop-ubuntu-amd64.deb",
+      "size": 9000000,
+      "state": "uploaded",
+      "digest": null
+    },
+    {
+      "name": "goh-desktop-ubuntu-arm64.deb",
+      "size": 8750000,
+      "state": "uploaded",
+      "digest": null
+    },
+    {
+      "name": "goh-desktop-windows-amd64-installer.exe",
+      "size": 10000000,
+      "state": "uploaded",
+      "digest": null
+    },
+    {
+      "name": "goh-desktop-windows-arm64-installer.exe",
+      "size": 9000000,
+      "state": "uploaded",
+      "digest": null
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 512,
+      "state": "uploaded",
+      "digest": null
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+---
+import Icon from '../components/Icon.astro';
+import { path, upstream } from '../lib/site';
+import '../styles/site.css';
+
+const { title, description, page } = Astro.props as { title: string; description: string; page: 'benchmarks' | 'downloads' };
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0b121b" />
+    <link rel="icon" href={path('icon.svg')} type="image/svg+xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href={path()} aria-label="GoHarness home"><span class="brand-mark"><Icon name="terminal" size={19} /></span>GoHarness</a>
+        <nav aria-label="Main navigation">
+          <a href={path()} aria-current={page === 'benchmarks' ? 'page' : undefined}>Benchmarks</a>
+          <a href={path('downloads/')} aria-current={page === 'downloads' ? 'page' : undefined}>Downloads</a>
+        </nav>
+        <a class="header-repo" href={upstream} aria-label="GoHarness on GitHub"><Icon name="github" size={19} /><span>GitHub</span></a>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <a class="brand" href={path()}><span class="brand-mark"><Icon name="terminal" size={17} /></span>GoHarness</a>
+        <div><a href={path('downloads/')}>Downloads</a><a href={upstream}>Source on GitHub</a></div>
+      </div>
+    </footer>
+  </body>
+</html>
