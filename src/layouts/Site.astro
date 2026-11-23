@@ -1,4 +1,5 @@
 ---
+import Metadata from '../components/Metadata.astro';
 import Icon from '../components/Icon.astro';
 import { path, upstream } from '../lib/site';
 import '@fontsource/barlow/latin-400.css';
@@ -7,17 +8,12 @@ import '@fontsource/barlow/latin-700.css';
 import '@fontsource/barlow-condensed/latin-600.css';
 import '../styles/site.css';
 
-const { title, description, page } = Astro.props as { title: string; description: string; page: 'benchmarks' | 'downloads' };
+const { title, description, page } = Astro.props as { title: string; description: string; page: 'benchmarks' | 'downloads' | 'not-found' };
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#f7f8f5" />
-    <link rel="icon" href={path('icon.svg')} type="image/svg+xml" />
-    <title>{title}</title>
+    <Metadata {title} {description} {page} />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

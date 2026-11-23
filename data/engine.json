@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "tag": "v1.1.0",
+    "assets": {
+      "goh-darwin-amd64": 15677760,
+      "goh-darwin-arm64": 14503410,
+      "goh-linux-amd64": 15339680,
+      "goh-linux-arm64": 14155936,
+      "goh-windows-amd64.exe": 15787008,
+      "goh-windows-arm64.exe": 14325248,
+      "SHA256SUMS": 506
+    }
+  }
+}

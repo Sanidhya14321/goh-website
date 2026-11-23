@@ -4,7 +4,7 @@ This Astro site publishes reviewed engine benchmarks and a build-time GoHarness 
 
 ## Local preview and checks
 
-Use Node 22.23.4 or newer. The checked-in catalog reflects the absence of a public stable desktop release.
+Use Node 22.23.4 or newer. The checked-in catalogs include the published GoHarness CLI release and the current Desktop availability.
 
 ```sh
 npm ci
@@ -21,34 +21,39 @@ Open the URL printed by Astro. For live reload while editing, use `npm run dev`.
 
 Add a reviewed JSON file to `data/benchmarks/` using the existing report as an example. Match the filename to its unique report ID, set `schemaVersion` to `1`, and use the evidence publication date. Point citations to a release tag or a full source commit with the supporting section or file. Include the measured build, model and run definition when the source supplies them. Chart entries point to values in their own tables. An optional spotlight selects rows from a solve-rate section for the homepage. Solve percentages are calculated from attempts.
 
-The homepage shows the newest reviewed report in its overview and retains all reports in publication order. Engine and desktop releases never change their labels. The initial set comes from the [v1.1.0 benchmark report](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/BENCHMARKS.md) and [verification log](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/development/VERIFICATION.md#110). The report is the published source for the loopback numbers. Its capture script is present in the engine workspace outside the tagged public tree. The engine [release workflow](https://github.com/Sanidhya14321/goh/blob/v1.1.0/.github/workflows/release.yml) publishes the separate [CLI release](https://github.com/Sanidhya14321/goh/releases/tag/v1.1.0) linked from the site.
+The homepage shows the newest reviewed report in its overview and retains all reports in publication order. Engine and desktop releases never change their labels. The initial set comes from the [v1.1.0 benchmark report](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/BENCHMARKS.md) and [verification log](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/development/VERIFICATION.md#110). The report is the published source for the loopback numbers. Its capture script is present in the engine workspace outside the tagged public tree. The engine [release workflow](https://github.com/Sanidhya14321/goh/blob/v1.1.0/.github/workflows/release.yml) produced the [v1.1.0 CLI release](https://github.com/Sanidhya14321/goh/releases/tag/v1.1.0).
 
-## Refresh the desktop catalog
+## Refresh the release catalogs
 
-`data/desktop-config.json` sets the default repository and the packages required for a complete release. The initial required matrix covers universal macOS, Ubuntu amd64, and Windows amd64. Ubuntu arm64 and Windows arm64 are enabled only when their uploaded assets are present in a complete release. Update the required matrix once the desktop release owner confirms the promised variants. Set `DESKTOP_RELEASE_REPO` to override the default `owner/repo`.
+`data/engine.json` tracks public stable CLI releases from [Sanidhya14321/goh](https://github.com/Sanidhya14321/goh/releases/latest). The site shows uploaded CLI assets for macOS, Linux, and Windows. Primary links follow GitHub’s latest stable release immediately. The release tag, size, and SHA-256 checksums link to the exact version they describe.
+
+`data/desktop-config.json` sets the Desktop repository and the matrix required for a complete release. The default requires macOS Universal, Ubuntu amd64, and Windows amd64. Ubuntu and Windows arm64 links appear when their uploaded assets are present in a complete stable release. Set `DESKTOP_RELEASE_REPO` to override the default `owner/repo` and use the same value for refresh and build.
 
 ```sh
+npm run refresh:engine
 npm run refresh:downloads
 npm run build
 ```
 
-The refresh checks GitHub’s public latest-release endpoint and writes `data/downloads.json`. An absent release or a partial required matrix produces an unavailable page. A network failure, rate limit, or invalid response fails the refresh and prevents deployment. A complete release supplies exact-name, nonempty uploaded assets. The primary buttons use GitHub’s latest-download URL. Version, size, and an available GitHub SHA-256 digest appear together with the pinned asset URL.
-
-Use the same repository override for refresh and build. To try fixture data locally, run `npm run refresh:downloads -- --fixture scripts/fixtures/complete-release.json` and build. Run the ordinary refresh again to restore public metadata. Fixture downloads are for testing page states.
+Both scripts resolve GitHub’s public latest-release endpoint at build time. Absent or incomplete Desktop releases remain unavailable. CLI availability is evaluated per binary. HTTP errors other than 404, including rate limits, fail the refresh and prevent deployment. `npm run test:build` uses fixtures and checks release links, benchmark independence, canonical URLs, social metadata, the sitemap, and the 404 page.
 
 ## Set up GitHub Pages once
 
-1. Create the website repository on GitHub and push this repository as its default `main` branch.
-2. In **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. For a custom domain, configure it in Pages. The workflow reads the origin and base path from Pages.
-3. If needed, set the repository Actions variable `DESKTOP_RELEASE_REPO` to the public desktop repository’s `owner/repo`.
-4. Run **Refresh downloads and publish Pages** from the **Actions** tab. It fetches current metadata, rebuilds the whole site and deploys it. Subsequent pushes to `main` and manual runs use the same workflow. **Validate website** tests static builds against fixtures on pushes and pull requests.
+1. Push this website repository to GitHub with `main` as its default branch.
+2. In **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. For a custom domain, configure it in Pages. The deployment workflow reads the public origin and base path from Pages.
+3. If needed, set the website repository Actions variable `DESKTOP_RELEASE_REPO` to the public Desktop release repository’s `owner/repo`.
+4. Run **Refresh downloads and publish Pages** from the **Actions** tab for the first deployment. Pushes to `main` and the hourly fallback also refresh both catalogs. **Validate website** runs build checks on pushes and pull requests.
 
-When the desktop repository is ready, use a draft release, upload all required assets, then publish it as the latest stable release. After publication and whenever supported assets or displayed metadata change, dispatch the website workflow from the desktop pipeline. Use a GitHub App installation token or fine-grained token with **Actions: write** on the website repository, stored as a desktop repository secret. Pass it as `GH_TOKEN` to the dispatch step.
+The engine repository has a separate **Refresh GoHarness website** workflow. It runs after the stable engine publication and package-manager steps, and responds to stable release events initiated by maintainers. In the engine repo, set `GOH_WEBSITE_REPO` to the website repository’s `owner/repo` and store a fine-grained token with **Actions: write** on that website repository as the `GOH_WEBSITE_REFRESH_TOKEN` Actions secret. The release pipeline dispatches the website’s `pages.yml`; the site always fetches current metadata. GitHub queues and runs the rebuild after dispatch. The fallback covers asset changes that do not emit a release event.
+
+The Desktop publisher can trigger the same workflow after uploading and promoting a complete stable release. Use a token scoped to **Actions: write** on the website repo in its `GH_TOKEN` environment variable.
 
 ```sh
-gh workflow run pages.yml --repo OWNER/goh-website --ref main
+gh workflow run pages.yml --repo OWNER/goh-website
 ```
 
-GitHub’s latest-download URLs follow the release GitHub marks latest immediately. Publish the complete matrix together and dispatch after uploads so new browser visits receive the current catalog as soon as Pages deploys it. The tag-specific metadata links continue to identify the exact assets recorded at build time.
+For other static hosts, set `SITE_URL` to the production origin, set `SITE_BASE` if the website is served below the domain root, and publish `dist/`. Builds without a production URL use `noindex`. The sitemap lists both public pages. If Pages serves the site below a path prefix, submit the sitemap URL directly in search engine webmaster tools, since crawlers look for robots.txt at the domain root.
+
+The homepage terminal image comes from the [engine’s v1.1.0 documentation](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/images/tui-session.png). The website crops the footer of the original screenshot and serves responsive WebP renditions.
 
 [GitHub release links](https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases) · [GitHub Pages publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)

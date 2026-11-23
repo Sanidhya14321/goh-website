@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import terminal from '../assets/goh-terminal.png';
 import Site from '../layouts/Site.astro';
 import BenchmarkSection from '../components/BenchmarkSection.astro';
 import Icon from '../components/Icon.astro';
@@ -11,17 +13,31 @@ const latest = sets[0];
 const published = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 const reportDate = (date: string) => published.format(new Date(date));
 ---
-<Site title="GoHarness Benchmarks" description="Published solve rates, token usage, and harness measurements for GoHarness, the local-first coding agent." page="benchmarks">
+<Site title="GoHarness | Local-first coding agent" description="Run GoHarness in your terminal, scripts, or editor. Explore published benchmarks and download the GoHarness CLI or Desktop." page="benchmarks">
   <section class="shell overview">
     <div class="overview-copy">
-      <h1>GoHarness<br />benchmarks</h1>
-      <p>GoHarness is a local-first coding agent written in Go. Run it in a terminal, in scripts, or from your editor.</p>
-      <a class="button primary" href={path('downloads/')}><Icon name="download" size={19} /> Desktop downloads</a>
+      <h1>GoHarness</h1>
+      <p class="hero-description">A local-first coding agent.</p>
+      <p class="hero-detail">Written in Go. Run it in your terminal, automate with the CLI, or connect it to your editor.</p>
+      <div class="hero-actions">
+        <a class="button primary" href={path('downloads/')}><Icon name="download" size={19} /> Download GoHarness</a>
+        <a href="#benchmark-results">Explore the benchmarks</a>
+      </div>
     </div>
-    <SolveSpotlight report={latest} />
+    <figure class="terminal-demo">
+      <figcaption><Icon name="terminal" size={17} /> GoHarness terminal interface</figcaption>
+      <Image src={terminal} widths={[480, 680, 1000, 1240]} sizes="(max-width: 768px) 100vw, 575px" alt="GoHarness terminal session showing an approved file edit and a passing verification check." loading="eager" fetchpriority="high" format="webp" />
+    </figure>
   </section>
   <div class="shell reports" id="benchmark-results">
-    <h2 class="visually-hidden">Benchmark results</h2>
+    <div class="evidence-intro">
+      <div>
+        <h2>Benchmark results</h2>
+        <p>See how often GoHarness solved the task, how much it sent to the model, and what the harness itself added in latency.</p>
+        <p>Every report records the model, GoHarness build, and how the run was measured.</p>
+      </div>
+      <SolveSpotlight report={latest} />
+    </div>
     {sets.length > 1 && <nav class="report-archive" aria-label="Benchmark reports">
       {sets.map((set) => <a href={`#${set.id}`}>{set.title}</a>)}
     </nav>}

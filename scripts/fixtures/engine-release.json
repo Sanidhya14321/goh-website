@@ -1,0 +1,16 @@
+{
+  "tag_name": "v9.2.3",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-11-23T10:00:00Z",
+  "assets": [
+    { "name": "goh-darwin-arm64", "state": "uploaded", "size": 14503410 },
+    { "name": "goh-darwin-amd64", "state": "uploaded", "size": 15677760 },
+    { "name": "goh-linux-amd64", "state": "uploaded", "size": 15339680 },
+    { "name": "goh-linux-arm64", "state": "uploaded", "size": 14155936 },
+    { "name": "goh-windows-amd64.exe", "state": "uploaded", "size": 15787008 },
+    { "name": "goh-windows-arm64.exe", "state": "uploaded", "size": 14325248 },
+    { "name": "SHA256SUMS", "state": "uploaded", "size": 506 },
+    { "name": "README.md", "state": "uploaded", "size": 10008 }
+  ]
+}

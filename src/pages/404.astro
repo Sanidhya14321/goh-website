@@ -1,0 +1,11 @@
+---
+import Site from '../layouts/Site.astro';
+import { path } from '../lib/site';
+---
+<Site title="Page not found | GoHarness" description="The requested GoHarness page could not be found." page="not-found">
+  <div class="shell not-found">
+    <h1>Page not found</h1>
+    <p>Check the link or head back to the GoHarness homepage.</p>
+    <a class="button primary" href={path()}>GoHarness home</a>
+  </div>
+</Site>

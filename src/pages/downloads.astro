@@ -2,8 +2,9 @@
 import { readFile } from 'node:fs/promises';
 import Site from '../layouts/Site.astro';
 import Icon from '../components/Icon.astro';
-import { cliInstall, cliRelease } from '../lib/site';
-import { configSchema, packageLinks, packages, readCatalog } from '../lib/downloads';
+import EngineDownloads from '../components/EngineDownloads.astro';
+import { formatBytes, packageLinks } from '../lib/releases';
+import { configSchema, packages, readCatalog } from '../lib/downloads';
 import catalogData from '../../data/downloads.json';
 import configData from '../../data/desktop-config.json';
 
@@ -16,22 +17,27 @@ const platformInfo = [
   { id: 'ubuntu', name: 'Ubuntu', instruction: 'Open the DEB with your package installer, or run apt from the download folder with the file you chose.' },
   { id: 'windows', name: 'Windows', instruction: 'Open the EXE installer and follow the setup prompts.' },
 ] as const;
-const mib = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 ---
-<Site title="Download GoHarness Desktop" description="Find GoHarness Desktop packages for macOS, Ubuntu, and Windows." page="downloads">
+<Site title="Download GoHarness" description="Get the GoHarness CLI for macOS, Linux, and Windows, and check package availability for GoHarness Desktop." page="downloads">
   <section class="shell download-intro">
     <div>
-      <h1>Download<br />GoHarness Desktop</h1>
-      <p>Choose a package for your operating system and processor.</p>
+      <h1>Download GoHarness</h1>
+      <p>Get the CLI or find a Desktop package for your operating system and processor.</p>
+      <nav class="download-jump" aria-label="GoHarness editions"><a href="#cli" class="button primary">CLI downloads</a><a href="#desktop" class="button secondary">Desktop packages</a></nav>
     </div>
     <aside class:list={['release-status', { ready: complete }]} aria-labelledby="release-status-title">
       <h2 id="release-status-title"><span class="status-dot" aria-hidden="true"></span>{complete ? 'Stable desktop packages available' : 'Desktop downloads unavailable'}</h2>
       {catalog.status === 'absent' && <p>There is no public stable desktop release yet.</p>}
       {catalog.status === 'partial' && <p>The latest stable release is missing required packages. Downloads will open when the release is complete.</p>}
-      {complete ? <p>The download buttons point to the latest stable release on GitHub.</p> : <a href="#cli">Get the GoHarness CLI</a>}
+      {complete && <p>The download buttons point to the latest stable Desktop release on GitHub.</p>}
     </aside>
   </section>
   <div class="shell downloads">
+    <EngineDownloads />
+    <section class="download-section desktop-packages" id="desktop" aria-labelledby="desktop-title">
+      <div class="download-section-heading">
+        <div><h2 id="desktop-title">GoHarness Desktop</h2><p>Desktop installers for macOS, Ubuntu, and Windows.</p></div>
+      </div>
     <nav class="jump-nav" aria-label="Operating systems">
       {platformInfo.map(({ id, name }) => <a href={`#${id}`}>{name}</a>)}
     </nav>
@@ -49,7 +55,7 @@ const mib = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
                   <>
                     <a class="button primary package-button" href={links.latest} aria-label={`Download ${name} · ${item.arch}`}><Icon name="download" size={17} /> Download</a>
                     <div class="asset-meta">
-                      <a href={links.pinned}>{catalog.tag} · {asset.bytes >= 1048576 ? `${mib.format(asset.bytes / 1048576)} MiB` : `${asset.bytes.toLocaleString('en-US')} bytes`}</a>
+                      <a href={links.pinned}>{catalog.tag} · {formatBytes(asset.bytes)}</a>
                       {asset.digest && <details><summary>SHA-256</summary><code class="disclosure-content">{asset.digest.split(':')[1]}</code></details>}
                     </div>
                   </>
@@ -64,12 +70,6 @@ const mib = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
         </div>
       </section>
     ))}
-    <aside class="cli-download" id="cli" aria-labelledby="cli-title">
-      <div>
-        <h2 id="cli-title"><Icon name="terminal" size={27} />GoHarness CLI</h2>
-        <p>Run GoHarness in your terminal on macOS, Linux, or Windows.</p>
-      </div>
-      <div class="cli-actions"><a class="button" href={cliRelease}>CLI release assets</a><a href={cliInstall}>CLI install guide</a></div>
-    </aside>
+    </section>
   </div>
 </Site>

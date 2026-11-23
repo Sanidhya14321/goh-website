@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { readBenchmarkSets, solveRate } from '../src/lib/benchmarks.ts';
+import { engineFromLatest } from '../src/lib/engine.ts';
 import { catalogFromLatest, configSchema, packages, readCatalog } from '../src/lib/downloads.ts';
 
 function json(path: string) {
@@ -72,4 +73,20 @@ test('reviewed benchmark files retain their own version and use coherent cohorts
   next.sections = json(file).sections;
   next.sections[1].result.charts[0].columns = [1, 9];
   assert.throws(() => readBenchmarkSets({ [newFile]: next }));
+});
+
+test('engine catalog follows the stable tag and only exposes recognized uploaded assets', () => {
+  const source = json('./fixtures/engine-release.json');
+  const { release } = engineFromLatest(source);
+  assert.equal(release?.tag, 'v9.2.3');
+  assert.equal(Object.keys(release?.assets ?? {}).length, 7);
+  assert.equal(release?.assets['goh-linux-amd64'], 15339680);
+  assert.equal(engineFromLatest({ ...source, prerelease: true }).release, null);
+  const partial = engineFromLatest({ ...source, assets: [
+    { name: 'goh-linux-amd64', state: 'open', size: 600 },
+    { name: 'goh-darwin-amd64', state: 'uploaded', size: 500 },
+    { name: 'goh-windows-amd64.exe', state: 'uploaded', size: 250 },
+    { name: 'goh-windows-amd64.exe', state: 'uploaded', size: 300 },
+  ] });
+  assert.deepEqual(partial.release?.assets, { 'goh-darwin-amd64': 500 });
 });

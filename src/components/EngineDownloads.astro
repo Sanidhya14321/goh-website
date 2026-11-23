@@ -1,0 +1,51 @@
+---
+import { readFile } from 'node:fs/promises';
+import Icon from './Icon.astro';
+import { engineGitHub, enginePlatforms, engineRepository, readEngineCatalog } from '../lib/engine';
+import { formatBytes, packageLinks } from '../lib/releases';
+import engineData from '../../data/engine.json';
+
+const override = process.env.GOH_ENGINE_CATALOG;
+const { release } = readEngineCatalog(override ? JSON.parse(await readFile(override, 'utf8')) : engineData);
+const releasePage = release && `${engineGitHub}/releases/tag/${encodeURIComponent(release.tag)}`;
+---
+<section class="download-section" id="cli" aria-labelledby="cli-title">
+  <div class="download-section-heading">
+    <div><h2 id="cli-title">GoHarness CLI</h2><p>Run GoHarness in your terminal on macOS, Linux, or Windows.</p></div>
+    <div class="release-actions">
+      <a class="button secondary" href={`${engineGitHub}/releases${release ? '/latest' : ''}`}>{release ? 'Latest CLI release' : 'CLI releases on GitHub'}</a>
+      <a href={`${engineGitHub}#install`}>CLI install guide</a>
+    </div>
+  </div>
+  {release ? (
+    <>
+      <div class="engine-packages">
+        {enginePlatforms.map(({ name, icon, assets }) => (
+          <div class="engine-platform">
+            <h3><Icon name={icon} size={22} />{name}</h3>
+            <ul class="package-list">
+              {assets.map(({ file, arch }) => {
+                const bytes = release.assets[file];
+                const links = packageLinks(engineRepository, release.tag, file);
+                return <li>
+                  {bytes ? (
+                    <>
+                      <a class="binary-download" href={links.latest} aria-label={`Download GoHarness CLI for ${name}, ${arch}`}>
+                        <span>{arch}</span><Icon name="download" size={17} />
+                      </a>
+                      <a class="asset-meta" href={links.pinned}>{release.tag} · {formatBytes(bytes)}</a>
+                    </>
+                  ) : <><strong>{arch}</strong><span class="package-unavailable">Unavailable in this release</span></>}
+                </li>;
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div class="release-notes">
+        <a href={releasePage}>Release notes for {release.tag}</a>
+        {release.assets.SHA256SUMS && <a href={packageLinks(engineRepository, release.tag, 'SHA256SUMS').pinned}>SHA-256 checksums for {release.tag}</a>}
+      </div>
+    </>
+  ) : <p class="empty-release">No public stable CLI release was available when this catalog was built.</p>}
+</section>

@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -28,6 +30,8 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm test
+      - name: Refresh public engine release metadata
+        run: npm run refresh:engine
       - name: Refresh public desktop release metadata
         run: npm run refresh:downloads
       - uses: actions/configure-pages@v5

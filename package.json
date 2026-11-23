@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "refresh:downloads": "node scripts/refresh-downloads.ts",
-    "test:build": "node scripts/verify-build.ts"
+    "test:build": "node scripts/verify-build.ts",
+    "refresh:engine": "node scripts/refresh-engine.ts"
   },
   "dependencies": {
     "@fontsource/barlow": "^5.3.0",
