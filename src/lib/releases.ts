@@ -10,6 +10,7 @@ const releaseSchema = z.object({
   draft: z.boolean(),
   prerelease: z.boolean(),
   published_at: z.iso.datetime().nullable(),
+  body: z.string().nullish(),
   assets: z.array(z.object({
     name: z.string(),
     state: z.string(),
@@ -25,7 +26,7 @@ export function stableRelease(input: unknown) {
   if (release.draft || release.prerelease || !release.published_at || !tagSchema.safeParse(release.tag_name).success) {
     return null;
   }
-  return release;
+  return { ...release, published_at: release.published_at };
 }
 
 export function uploadedAssets(release: NonNullable<ReturnType<typeof stableRelease>>) {
@@ -36,12 +37,8 @@ export function uploadedAssets(release: NonNullable<ReturnType<typeof stableRele
   return release.assets.filter(({ name, state, size }) => counts.get(name) === 1 && state === 'uploaded' && size > 0);
 }
 
-export function packageLinks(repo: string, tag: string, name: string) {
-  const releases = `https://github.com/${repo}/releases`;
-  return {
-    latest: `${releases}/latest/download/${name}`,
-    pinned: `${releases}/download/${encodeURIComponent(tag)}/${name}`,
-  };
+export function packageLink(repo: string, tag: string, name: string) {
+  return `https://github.com/${repo}/releases/download/${encodeURIComponent(tag)}/${name}`;
 }
 
 const mib = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });

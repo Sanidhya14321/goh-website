@@ -48,7 +48,6 @@ try {
     const engineRelease = state !== 'absent';
     assert.ok(downloads.includes(`href="${engineGitHub}/releases${engineRelease ? '/latest' : ''}"`));
     for (const { file } of enginePlatforms.flatMap(({ assets }) => [...assets])) {
-      assert.equal(downloads.includes(`${engineGitHub}/releases/latest/download/${file}`), engineRelease);
       assert.equal(downloads.includes(`${engineGitHub}/releases/download/v9.2.3/${file}`), engineRelease);
     }
     assert.equal(downloads.includes(`${engineGitHub}/releases/download/v9.2.3/SHA256SUMS`), engineRelease);
@@ -59,10 +58,12 @@ try {
     if (state === 'complete') {
       assert.ok(downloads.includes('Stable desktop packages available'));
       for (const { name } of packages) {
-        assert.ok(downloads.includes(`${stableBase}latest/download/${name}`));
         assert.ok(downloads.includes(`${stableBase}download/v2.3.4/${name}`));
       }
       assert.ok(downloads.includes('v2.3.4 · 11.4 MiB'));
+      assert.ok(downloads.includes(`${stableBase}tag/v2.3.4`));
+      assert.ok(downloads.includes(`${engineGitHub}/releases/tag/v1.1.0`));
+      assert.ok(downloads.includes('bundles <a'));
       assert.ok(downloads.includes('ab'.repeat(32)));
     } else {
       assert.ok(downloads.includes('Desktop downloads unavailable'));

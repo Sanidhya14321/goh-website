@@ -2,7 +2,7 @@
 import { readFile } from 'node:fs/promises';
 import Icon from './Icon.astro';
 import { engineGitHub, enginePlatforms, engineRepository, readEngineCatalog } from '../lib/engine';
-import { formatBytes, packageLinks } from '../lib/releases';
+import { formatBytes, packageLink } from '../lib/releases';
 import engineData from '../../data/engine.json';
 
 const override = process.env.GOH_ENGINE_CATALOG;
@@ -26,14 +26,14 @@ const releasePage = release && `${engineGitHub}/releases/tag/${encodeURIComponen
             <ul class="package-list">
               {assets.map(({ file, arch }) => {
                 const bytes = release.assets[file];
-                const links = packageLinks(engineRepository, release.tag, file);
+                const url = packageLink(engineRepository, release.tag, file);
                 return <li>
                   {bytes ? (
                     <>
-                      <a class="binary-download" href={links.latest} aria-label={`Download GoHarness CLI for ${name}, ${arch}`}>
+                      <a class="binary-download" href={url} aria-label={`Download GoHarness CLI for ${name}, ${arch}`}>
                         <span>{arch}</span><Icon name="download" size={17} />
                       </a>
-                      <a class="asset-meta" href={links.pinned}>{release.tag} · {formatBytes(bytes)}</a>
+                      <span class="asset-meta">{release.tag} · {formatBytes(bytes)}</span>
                     </>
                   ) : <><strong>{arch}</strong><span class="package-unavailable">Unavailable in this release</span></>}
                 </li>;
@@ -44,7 +44,8 @@ const releasePage = release && `${engineGitHub}/releases/tag/${encodeURIComponen
       </div>
       <div class="release-notes">
         <a href={releasePage}>Release notes for {release.tag}</a>
-        {release.assets.SHA256SUMS && <a href={packageLinks(engineRepository, release.tag, 'SHA256SUMS').pinned}>SHA-256 checksums for {release.tag}</a>}
+        {release.publishedAt && <time datetime={release.publishedAt}>Published {release.publishedAt.slice(0, 10)}</time>}
+        {release.assets.SHA256SUMS && <a href={packageLink(engineRepository, release.tag, 'SHA256SUMS')}>SHA-256 checksums for {release.tag}</a>}
       </div>
     </>
   ) : <p class="empty-release">No public stable CLI release was available when this catalog was built.</p>}

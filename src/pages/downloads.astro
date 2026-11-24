@@ -3,7 +3,8 @@ import { readFile } from 'node:fs/promises';
 import Site from '../layouts/Site.astro';
 import Icon from '../components/Icon.astro';
 import EngineDownloads from '../components/EngineDownloads.astro';
-import { formatBytes, packageLinks } from '../lib/releases';
+import { engineGitHub } from '../lib/engine';
+import { formatBytes, packageLink } from '../lib/releases';
 import { configSchema, packages, readCatalog } from '../lib/downloads';
 import catalogData from '../../data/downloads.json';
 import configData from '../../data/desktop-config.json';
@@ -29,14 +30,15 @@ const platformInfo = [
       <h2 id="release-status-title"><span class="status-dot" aria-hidden="true"></span>{complete ? 'Stable desktop packages available' : 'Desktop downloads unavailable'}</h2>
       {catalog.status === 'absent' && <p>There is no public stable desktop release yet.</p>}
       {catalog.status === 'partial' && <p>The latest stable release is missing required packages. Downloads will open when the release is complete.</p>}
-      {complete && <p>The download buttons point to the latest stable Desktop release on GitHub.</p>}
+      {complete && <p><a href={`https://github.com/${catalog.repository}/releases/tag/${encodeURIComponent(catalog.tag)}`}>Desktop {catalog.tag} on GitHub</a>{catalog.engineTag && <> bundles <a href={`${engineGitHub}/releases/tag/${catalog.engineTag}`}>GoHarness {catalog.engineTag}</a></>}.</p>}
     </aside>
   </section>
   <div class="shell downloads">
     <EngineDownloads />
     <section class="download-section desktop-packages" id="desktop" aria-labelledby="desktop-title">
       <div class="download-section-heading">
-        <div><h2 id="desktop-title">GoHarness Desktop</h2><p>Desktop installers for macOS, Ubuntu, and Windows.</p></div>
+        <div><h2 id="desktop-title">GoHarness Desktop</h2><p>Standalone app for macOS, Ubuntu, and Windows. The installer includes the GoHarness engine.</p></div>
+        <a href={`https://github.com/${config.repository}`}>Desktop source on GitHub</a>
       </div>
     <nav class="jump-nav" aria-label="Operating systems">
       {platformInfo.map(({ id, name }) => <a href={`#${id}`}>{name}</a>)}
@@ -47,15 +49,15 @@ const platformInfo = [
         <ul class="package-list">
           {packages.filter((item) => item.platform === id).map((item) => {
             const asset = complete ? catalog.assets.find(({ variant }) => variant === item.id) : undefined;
-            const links = complete && asset ? packageLinks(catalog.repository, catalog.tag, item.name) : undefined;
+            const url = complete && asset ? packageLink(catalog.repository, catalog.tag, item.name) : undefined;
             return (
               <li>
                 <div class="package-title"><strong>{item.arch}</strong><span>.{item.format.toLowerCase()}</span></div>
-                {links && asset && complete ? (
+                {url && asset && complete ? (
                   <>
-                    <a class="button primary package-button" href={links.latest} aria-label={`Download ${name} · ${item.arch}`}><Icon name="download" size={17} /> Download</a>
+                    <a class="button primary package-button" href={url} aria-label={`Download ${name} · ${item.arch}`}><Icon name="download" size={17} /> Download</a>
                     <div class="asset-meta">
-                      <a href={links.pinned}>{catalog.tag} · {formatBytes(asset.bytes)}</a>
+                      <span>{catalog.tag} · {formatBytes(asset.bytes)}</span>
                       {asset.digest && <details><summary>SHA-256</summary><code class="disclosure-content">{asset.digest.split(':')[1]}</code></details>}
                     </div>
                   </>

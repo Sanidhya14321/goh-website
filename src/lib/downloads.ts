@@ -18,10 +18,12 @@ export const configSchema = z.object({
 const catalogBase = { schemaVersion: z.literal(1), repository: repositorySchema };
 const assetSchema = z.object({ variant: variants, bytes: bytesSchema, digest: digestSchema.optional() }).strict();
 
+const engineTagSchema = z.string().regex(/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
+
 const catalogSchema = z.discriminatedUnion('status', [
   z.object({ ...catalogBase, status: z.literal('absent') }).strict(),
   z.object({ ...catalogBase, status: z.literal('partial'), missing: z.array(variants).min(1) }).strict(),
-  z.object({ ...catalogBase, status: z.literal('complete'), tag: tagSchema, assets: z.array(assetSchema).min(1) }).strict(),
+  z.object({ ...catalogBase, status: z.literal('complete'), tag: tagSchema, engineTag: engineTagSchema.optional(), assets: z.array(assetSchema).min(1) }).strict(),
 ]);
 
 export type Catalog = z.infer<typeof catalogSchema>;
@@ -42,7 +44,11 @@ export function catalogFromLatest(config: Config, input: unknown): Catalog {
 
   const missing = config.requiredVariants.filter((id) => !assets.some((asset) => asset.variant === id));
   if (missing.length) return { ...base, status: 'partial', missing };
-  return { ...base, status: 'complete', tag: release.tag_name, assets };
+  const engineTag = engineTagSchema.safeParse(release.body?.match(/^Engine: (v[^\s]+)\r?$/m)?.[1]);
+  return {
+    ...base, status: 'complete', tag: release.tag_name, assets,
+    ...(engineTag.success ? { engineTag: engineTag.data } : {}),
+  };
 }
 
 export function readCatalog(input: unknown, config: Config): Catalog {

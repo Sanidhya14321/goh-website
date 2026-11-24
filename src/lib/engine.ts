@@ -22,6 +22,7 @@ export const enginePlatforms = [
 const recognizedFiles = z.enum([...enginePlatforms.flatMap(({ assets }) => assets.map(({ file }) => file)), 'SHA256SUMS']);
 const release = z.object({
   tag: tagSchema,
+  publishedAt: z.iso.datetime().optional(),
   assets: z.partialRecord(recognizedFiles, bytesSchema),
 }).strict();
 
@@ -38,6 +39,7 @@ export function engineFromLatest(input: unknown) {
     schemaVersion: 1,
     release: latest ? {
       tag: latest.tag_name,
+      publishedAt: latest.published_at,
       assets: Object.fromEntries(uploadedAssets(latest)
         .filter(({ name }) => recognizedFiles.safeParse(name).success)
         .map(({ name, size }) => [name, size])),
