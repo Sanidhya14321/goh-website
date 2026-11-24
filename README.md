@@ -37,11 +37,17 @@ npm run build
 
 Both scripts resolve GitHub’s public latest-release endpoint at build time. Absent or incomplete Desktop releases remain unavailable. CLI availability is evaluated per binary. HTTP errors other than 404, including rate limits, fail the refresh and prevent deployment. `npm run test:build` uses fixtures and checks release links, benchmark independence, canonical URLs, social metadata, the sitemap, and the 404 page.
 
-## Set up GitHub Pages once
+## Production on Vercel
+
+The Vercel project builds the `main` branch from this repository. Its build command refreshes the public CLI and Desktop catalogs before Astro generates the static files. The production hostname comes from Vercel, and preview builds use `noindex`. The headers in `vercel.json` enforce HTTPS, disable scripts and framing, and restrict image and font loads to this origin. Inline styles are permitted for the static chart geometry.
+
+A Vercel Deploy Hook on `main` can refresh package metadata immediately after a release. Keep its URL in the publisher’s `GOH_WEBSITE_VERCEL_HOOK` Actions secret. Treat the hook URL as a credential. Once configured, release workflows can send a POST without a broad Vercel API token.
+
+## Optional GitHub Pages setup
 
 1. Push this website repository to GitHub with `main` as its default branch.
 2. In **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. For a custom domain, configure it in Pages. The deployment workflow reads the public origin and base path from Pages.
-3. If needed, set the website repository Actions variable `DESKTOP_RELEASE_REPO` to the public Desktop release repository’s `owner/repo`.
+3. Set the website repository Actions variable `PUBLISH_GITHUB_PAGES=true`. If needed, set `DESKTOP_RELEASE_REPO` to the public Desktop release repository’s `owner/repo`.
 4. Run **Refresh downloads and publish Pages** from the **Actions** tab for the first deployment. Pushes to `main` and the hourly fallback also refresh both catalogs. **Validate website** runs build checks on pushes and pull requests.
 
 The engine repository has a separate **Refresh GoHarness website** workflow. It runs after the stable engine publication and package-manager steps, and responds to stable release events initiated by maintainers. In the engine repo, set `GOH_WEBSITE_REPO` to the website repository’s `owner/repo` and store a fine-grained token with **Actions: write** on that website repository as the `GOH_WEBSITE_REFRESH_TOKEN` Actions secret. The release pipeline dispatches the website’s `pages.yml`; the site always fetches current metadata. GitHub queues and runs the rebuild after dispatch. The fallback covers asset changes that do not emit a release event.
