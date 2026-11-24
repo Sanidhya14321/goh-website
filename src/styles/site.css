@@ -36,6 +36,7 @@ svg { flex: none; }
 .header-inner { display: flex; align-items: center; gap: clamp(1rem, 5vw, 4rem); min-height: 4.65rem; }
 .brand { display: inline-flex; align-items: center; gap: .62rem; color: var(--ink); font-size: 1.24rem; font-weight: 700; letter-spacing: -.02em; text-decoration: none; }
 .brand-mark { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: .3rem; background: var(--accent); color: var(--paper); }
+.site-beta { color: var(--accent); font-size: .76rem; font-weight: 600; white-space: nowrap; }
 .header-inner nav { display: flex; align-self: stretch; gap: clamp(1rem, 3vw, 2rem); }
 .header-inner nav a { position: relative; display: flex; align-items: center; color: var(--muted); font-size: .98rem; font-weight: 600; text-decoration: none; }
 .header-inner nav a[aria-current], .header-inner nav a:hover { color: var(--accent); }
@@ -183,6 +184,7 @@ details summary { width: fit-content; color: var(--accent); cursor: pointer; fon
 .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem 1.2rem; padding-block: 1.2rem; }
 .footer-inner > div { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
 .footer-inner > div a { color: var(--muted); font-size: .93rem; }
+.site-status { flex-basis: 100%; color: var(--muted); font-size: .93rem; }
 
 @media (max-width: 64rem) {
   .shell { width: calc(100% - 3.5rem); }

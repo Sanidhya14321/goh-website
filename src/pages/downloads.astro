@@ -19,16 +19,16 @@ const platformInfo = [
   { id: 'windows', name: 'Windows', instruction: 'Open the EXE installer and follow the setup prompts.' },
 ] as const;
 ---
-<Site title="Download GoHarness" description="Get the GoHarness CLI for macOS, Linux, and Windows, and check package availability for GoHarness Desktop." page="downloads">
+<Site title="Download GoHarness" description="Get the GoHarness CLI for macOS, Linux, and Windows, and check package availability for GoHarness Desktop Beta." page="downloads">
   <section class="shell download-intro">
     <div>
       <h1>Download GoHarness</h1>
       <p>Get the CLI or find a Desktop package for your operating system and processor.</p>
-      <nav class="download-jump" aria-label="GoHarness editions"><a href="#cli" class="button primary">CLI downloads</a><a href="#desktop" class="button secondary">Desktop packages</a></nav>
+      <nav class="download-jump" aria-label="GoHarness editions"><a href="#cli" class="button primary">CLI downloads</a><a href="#desktop" class="button secondary">Desktop Beta packages</a></nav>
     </div>
     <aside class:list={['release-status', { ready: complete }]} aria-labelledby="release-status-title">
-      <h2 id="release-status-title"><span class="status-dot" aria-hidden="true"></span>{complete ? 'Stable desktop packages available' : 'Desktop downloads unavailable'}</h2>
-      {catalog.status === 'absent' && <p>There is no public stable desktop release yet.</p>}
+      <h2 id="release-status-title"><span class="status-dot" aria-hidden="true"></span>{complete ? 'Desktop Beta packages available' : 'Desktop downloads unavailable'}</h2>
+      {catalog.status === 'absent' && <p>There are no public Desktop Beta packages on the main release channel yet.</p>}
       {catalog.status === 'partial' && <p>The latest stable release is missing required packages. Downloads will open when the release is complete.</p>}
       {complete && <p><a href={`https://github.com/${catalog.repository}/releases/tag/${encodeURIComponent(catalog.tag)}`}>Desktop {catalog.tag} on GitHub</a>{catalog.engineTag && <> bundles <a href={`${engineGitHub}/releases/tag/${catalog.engineTag}`}>GoHarness {catalog.engineTag}</a></>}.</p>}
     </aside>
@@ -37,7 +37,7 @@ const platformInfo = [
     <EngineDownloads />
     <section class="download-section desktop-packages" id="desktop" aria-labelledby="desktop-title">
       <div class="download-section-heading">
-        <div><h2 id="desktop-title">GoHarness Desktop</h2><p>Standalone app for macOS, Ubuntu, and Windows. The installer includes the GoHarness engine.</p></div>
+        <div><h2 id="desktop-title">GoHarness Desktop Beta</h2><p>Standalone app for macOS, Ubuntu, and Windows. The installer includes the GoHarness engine.</p></div>
         <a href={`https://github.com/${config.repository}`}>Desktop source on GitHub</a>
       </div>
     <nav class="jump-nav" aria-label="Operating systems">

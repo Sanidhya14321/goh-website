@@ -1,6 +1,6 @@
-# GoHarness website
+# GoHarness website beta
 
-This Astro site publishes reviewed engine benchmarks and a build-time GoHarness Desktop download catalog. A production build produces HTML and CSS in `dist/`. Node runs on the build machine only.
+This Astro site publishes reviewed engine benchmarks and a build-time GoHarness Desktop Beta download catalog. Update the beta site content when harness development is complete. A production build produces HTML and CSS in `dist/`. Node runs on the build machine only.
 
 - [Live GoHarness website](https://goh-website-three.vercel.app)
 - [GoHarness engine and CLI releases](https://github.com/Sanidhya14321/goh)

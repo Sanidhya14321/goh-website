@@ -23,6 +23,8 @@ try {
     execFileSync(process.execPath, ['node_modules/astro/bin/astro.mjs', 'build', '--outDir', out], { cwd: root, env, stdio: 'inherit' });
     const home = readFileSync(join(out, 'index.html'), 'utf8');
     const downloads = readFileSync(join(out, 'downloads/index.html'), 'utf8');
+    assert.ok(home.includes('Website beta') && downloads.includes('Website beta'));
+    assert.ok(downloads.includes('GoHarness Desktop Beta'));
 
     assert.ok(home.includes('href="/goh-website/downloads/"'));
     assert.ok(home.includes('href="/goh-website/icon.svg"'));
@@ -56,7 +58,7 @@ try {
 
     const stableBase = `https://github.com/${repo}/releases/`;
     if (state === 'complete') {
-      assert.ok(downloads.includes('Stable desktop packages available'));
+      assert.ok(downloads.includes('Desktop Beta packages available'));
       for (const { name } of packages) {
         assert.ok(downloads.includes(`${stableBase}download/v2.3.4/${name}`));
       }
@@ -67,7 +69,7 @@ try {
       assert.ok(downloads.includes('ab'.repeat(32)));
     } else {
       assert.ok(downloads.includes('Desktop downloads unavailable'));
-      assert.ok(downloads.includes(state === 'partial' ? 'missing required packages' : 'no public stable desktop release'));
+      assert.ok(downloads.includes(state === 'partial' ? 'missing required packages' : 'no public Desktop Beta packages'));
       assert.ok(!downloads.includes(stableBase));
       assert.ok(!downloads.includes('v2.3.4'));
     }

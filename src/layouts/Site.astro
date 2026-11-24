@@ -19,7 +19,7 @@ const { title, description, page } = Astro.props as { title: string; description
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="shell header-inner">
-        <a class="brand" href={path()} aria-label="GoHarness home"><span class="brand-mark"><Icon name="terminal" size={19} /></span>GoHarness</a>
+        <a class="brand" href={path()} aria-label="GoHarness beta website home"><span class="brand-mark"><Icon name="terminal" size={19} /></span>GoHarness <span class="site-beta">Website beta</span></a>
         <nav aria-label="Main navigation">
           <a href={path()} aria-current={page === 'benchmarks' ? 'page' : undefined}>Benchmarks</a>
           <a href={path('downloads/')} aria-current={page === 'downloads' ? 'page' : undefined}>Downloads</a>
@@ -32,6 +32,7 @@ const { title, description, page } = Astro.props as { title: string; description
       <div class="shell footer-inner">
         <a class="brand" href={path()}><span class="brand-mark"><Icon name="terminal" size={17} /></span>GoHarness</a>
         <div><a href={path('downloads/')}>Downloads</a><a href={upstream}>Source on GitHub</a></div>
+        <p class="site-status">Site content will be updated when the harness is complete.</p>
       </div>
     </footer>
   </body>
