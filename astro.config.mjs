@@ -6,6 +6,8 @@ const vercelOrigin = process.env.VERCEL_ENV === 'production' && process.env.VERC
 
 export default defineConfig({
   output: 'static',
+  build: { inlineStylesheets: 'never' },
+  markdown: { syntaxHighlight: false },
   site: process.env.SITE_URL || vercelOrigin,
   base: process.env.SITE_BASE || '/',
   trailingSlash: 'always',

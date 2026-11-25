@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -61,7 +62,22 @@ try {
     }
     assert.equal(downloads.includes(`${engineGitHub}/releases/download/v9.2.3/SHA256SUMS`), engineRelease);
     assert.ok(!home.includes('v9.2.3'));
-    assert.doesNotMatch(pages.map(([html]) => html).join(''), /<script\b|api\.github\.com|\/Users\//);
+    const interaction = readFileSync(join(out, 'interactions.js'));
+    const integrity = `sha384-${createHash('sha384').update(interaction).digest('base64')}`;
+    const vercel = JSON.parse(readFileSync(join(root, 'vercel.json'), 'utf8'));
+    const policy = vercel.headers[0].headers.find(({ key }: { key: string }) => key === 'Content-Security-Policy').value;
+    assert.ok(policy.includes(`script-src '${integrity}'`));
+    assert.ok(policy.includes("style-src 'self'; style-src-attr 'none'"));
+    for (const [html, route] of pages) {
+      assert.doesNotMatch(html, /api\.github\.com|\/Users\/|<style\b|\sstyle="/);
+      const scripts = html.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? [];
+      assert.equal(scripts.length, route === '/get-started/' || route === '/benchmarks/' ? 1 : 0);
+      for (const script of scripts) {
+        assert.ok(script.startsWith('<script src="/goh-website/interactions.js"'));
+        assert.ok(script.includes(`integrity="${integrity}"`));
+        assert.ok(script.endsWith('></script>'));
+      }
+    }
 
     const stableBase = `https://github.com/${repo}/releases/`;
     if (state === 'complete') {

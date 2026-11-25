@@ -3,6 +3,7 @@ import Bars from './Bars.astro';
 import { categoryLabels, solveRate, type BenchmarkSection } from '../lib/benchmarks';
 const { section, anchor } = Astro.props as { section: BenchmarkSection; anchor: string };
 const { result } = section;
+const models = result.kind === 'live-solves' ? [...new Set(result.rows.map(({ model }) => model))] : [];
 const numeric = new Intl.NumberFormat('en-US');
 ---
 <section class="report-section" id={anchor} aria-labelledby={`${anchor}-title`}>
@@ -15,15 +16,23 @@ const numeric = new Intl.NumberFormat('en-US');
   </div>
   {result.kind === 'live-solves' ? (
     <>
+      {models.length > 1 && <div class="benchmark-filter" data-model-filter hidden>
+        <label for={`${anchor}-model`}>Filter by model</label>
+        <select id={`${anchor}-model`}>
+          <option value="">All models</option>
+          {models.map((model) => <option value={model}>{model}</option>)}
+        </select>
+        <span role="status"></span>
+      </div>}
       <Bars title="Share of attempts solved" values={result.rows.map((row) => ({
-        label: row.name, value: solveRate(row.solved, row.attempts), detail: `${row.solved}/${row.attempts} · ${row.model}`,
+        label: row.name, value: solveRate(row.solved, row.attempts), detail: `${row.solved}/${row.attempts} · ${row.model}`, model: row.model,
       }))} maximum={100} unit="%" endpoint="100%" />
       <div class="table-scroll" role="region" aria-labelledby={`${anchor}-caption`} tabindex="0">
         <table class="solve-table">
           <caption id={`${anchor}-caption`}>Published results by run</caption>
           <thead><tr>{['Run', 'Harness', 'Model', 'Tasks', 'Attempts', 'Solved', 'False completions', 'Tool calls', 'Time (s)'].map((label) => <th scope="col">{label}</th>)}</tr></thead>
           <tbody>{result.rows.map((row) => (
-            <tr>
+            <tr data-benchmark-model={row.model}>
               <th scope="row">{row.name}</th><td>{row.harness}</td><td><code>{row.model}</code></td>
               <td>{row.taskCount} <small>{row.taskNotes}</small></td><td>{row.attempts}</td>
               <td class="result-number">{row.solved} ({solveRate(row.solved, row.attempts)}%)</td>

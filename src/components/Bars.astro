@@ -1,7 +1,7 @@
 ---
 const { title, values, maximum, unit, decimals = 0, endpoint, compact = false } = Astro.props as {
   title: string;
-  values: { label: string; value: number; detail?: string }[];
+  values: { label: string; value: number; detail?: string; model?: string }[];
   maximum: number;
   unit: string;
   decimals?: number;
@@ -13,10 +13,12 @@ const format = new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals,
 <figure class:list={['chart', { compact }]}>
   <figcaption>{title}</figcaption>
   <ul class="bar-list">
-    {values.map(({ label, value, detail }, index) => (
-      <li>
+    {values.map(({ label, value, detail, model }, index) => (
+      <li data-benchmark-model={model}>
         <span class="bar-label">{label}{detail && <small>{detail}</small>}</span>
-        <span class="bar-track" aria-hidden="true"><span class:list={['bar-fill', { dim: compact && index === 0 }]} style={`width:${value / (maximum || 1) * 100}%`}></span></span>
+        <svg class="bar-track" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+          <rect class:list={['bar-fill', { dim: compact && index === 0 }]} width={value / (maximum || 1) * 100} height="10" />
+        </svg>
         <span class="bar-number">{format.format(value)}{unit === '%' ? unit : ` ${unit}`}</span>
       </li>
     ))}

@@ -45,7 +45,7 @@ Both scripts resolve GitHub’s public latest-release endpoint at build time. Ab
 
 The Vercel project builds the `main` branch. [Sync GoHarness releases](.github/workflows/sync-releases.yml) checks the public CLI and Desktop releases on GitHub hourly and on manual dispatch. It commits the catalogs to the default branch only when the release data changes. Vercel deploys the updated catalogs through its GitHub integration. GitHub may delay scheduled runs. The download links remain pinned to the catalog’s exact version between builds.
 
-The production hostname comes from Vercel, and preview builds use `noindex`. The headers in `vercel.json` enforce HTTPS, disable scripts and framing, and restrict image and font loads to this origin. Inline styles support the static charts.
+The production hostname comes from Vercel, and preview builds use `noindex`. The headers in `vercel.json` enforce HTTPS, block framing and outbound browser requests made by page scripts, and restrict image, stylesheet, and font loads to this origin. The two interactive pages load a single script pinned by both CSP and Subresource Integrity. Inline scripts and styles are blocked. When editing `public/interactions.js`, regenerate its CSP hash with `openssl dgst -sha384 -binary public/interactions.js | openssl base64 -A` and replace the existing value after `sha384-` in `vercel.json`. The static build test checks that the file, CSP, and rendered script integrity agree.
 
 ## Optional GitHub Pages setup
 

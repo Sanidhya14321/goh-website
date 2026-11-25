@@ -1,17 +1,17 @@
-A finished run reports its outcome separately from the model’s reply. After a change, GoHarness records recognized checks such as tests, builds, linters, type checks, and explicit assertions. Add a project-specific verification command if you want GoHarness to run a particular check after changes. [Verification details](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#headless-cli)
+A finished run reports its outcome separately from the model’s reply. The run outcome can include evidence from a recognized test, build, lint or type check, explicit assertion, program run, or configured verifier. Add a project-specific verification command if you want GoHarness to run a particular check after changes. [Verification details](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#headless-cli)
 
 ## Run outcomes
 
 | Outcome | What it means |
 | --- | --- |
-| Verified | GoHarness recorded a passing check for the change. Open the evidence to see the command and scope. |
-| Unverified | GoHarness recorded file changes or incomplete change tracking without a qualifying passing check. |
+| Verified | GoHarness recorded a qualifying passing check. Open the evidence to see its command and scope. |
+| Unverified | GoHarness could not confirm verification. A missing qualifying check, incomplete change tracking, or a configured verifier that kept changing files can result in this outcome. |
 | No changes | GoHarness ended the run without detecting file changes. |
 | Failed verification | The configured check still failed after the allowed repair attempts. |
 
 ## Evidence and budgets
 
-The run record identifies the check’s source, command, kind, scope, exit code, revision, and change-tracking coverage when available. A passing check covers the work it exercised. Set wall time, tool-call, and token limits for a run and its children. For a Go project, put the following in your user configuration to run the suite after a change and allow one repair attempt. [Run outcomes and evidence](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#headless-cli) · [Verification and budgets](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#verification-and-budgets)
+When available, the run record includes the check’s source, command, kind, scope, exit code, and revision, plus a change-tracking status. Use the command and scope to see what was checked. Set wall time, tool-call, and token limits for a run and its children. For a Go project, put the following in your user configuration to run the suite after a change and allow one repair attempt. [Run outcomes and evidence](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#headless-cli) · [Verification and budgets](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#verification-and-budgets)
 
 ```json
 {
@@ -33,7 +33,7 @@ The run record identifies the check’s source, command, kind, scope, exit code,
 
 ## Review and enforcement
 
-Approve an action once or grant similar actions for a session. Use command and file rules or folder-specific access settings for recurring decisions. Folder trust lets you reopen a workspace directly. Tool approval controls whether an action can run. Shell confinement controls what a running command can reach. Web approvals can be scoped to an origin. Child processes receive a filtered environment. The shell sandbox uses sandbox-exec on macOS and Landlock on supported Linux kernels. Its network and file protections vary by OS and configuration. On Windows and on Linux without Landlock, access levels that depend on automatic confinement ask first. A command that explicitly requires an unavailable sandbox is refused. Shell confinement covers commands, jobs, and formatters. MCP, LSP, and hooks have separate controls. [Access levels](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#access-levels) · [Sandbox boundaries](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#shell-sandbox) · [Platform coverage](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/development/STATUS.md#platform-coverage)
+Approve an action once or grant similar actions for a session. Use command and file rules or folder-specific access settings for recurring decisions. Folder trust lets you reopen a workspace directly. Tool approval controls whether an action can run. Shell confinement controls what a running command can reach. Web approvals can be scoped to an origin. Child processes receive a filtered environment. The shell sandbox uses sandbox-exec on macOS and Landlock on supported Linux kernels. Its network and file protections vary by OS and configuration. On Windows, automatic command execution that depends on shell confinement asks for approval. The shell sandbox requires Landlock on Linux, and network blocking requires Linux 6.7 or later. GoHarness refuses commands when the requested sandbox is unavailable. Shell confinement covers commands, jobs, and formatters. MCP, LSP, and hooks have separate controls. [Access levels](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#access-levels) · [Sandbox boundaries](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#shell-sandbox) · [Platform coverage](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/development/STATUS.md#platform-coverage)
 
 ## File protections
 
@@ -41,4 +41,4 @@ The built-in file tools operate inside the selected project. Editing an existing
 
 ## What stays on your machine
 
-The GoHarness process, session journals, and tool execution run locally. A configured provider receives prompts and the relevant context assembled for a request, which can include attached files, tool output, and conversation history. A local Ollama route supplies local inference. Configured web tools and remote integrations contact their respective services. API keys are scoped to their routes, and saved credentials can be sealed using the OS credential store. Project content can appear in transcripts and exports, so review them before sharing. [Architecture and provider requests](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/ARCHITECTURE.md#one-prompt-end-to-end) · [Credentials](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#credentials) · [Sessions and exports](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#sessions-and-recovery)
+The GoHarness process, session journals, and tool execution run locally. A configured provider receives prompts and the relevant context assembled for a request, which can include attached files, tool output, and conversation history. A local Ollama route supplies local inference. Configured web tools and remote integrations contact their respective services. API keys are scoped to their endpoints. The credential store can seal matching saved provider keys where the operating system supports it. Project content can appear in transcripts and exports, so review them before sharing. [Architecture and provider requests](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/ARCHITECTURE.md#one-prompt-end-to-end) · [Credentials](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#credentials) · [Sessions and exports](https://github.com/Sanidhya14321/goh/blob/v1.1.0/docs/USER_GUIDE.md#sessions-and-recovery)

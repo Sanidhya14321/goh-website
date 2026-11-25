@@ -118,7 +118,7 @@
       "id": "token-efficiency",
       "title": "Input tokens and latency",
       "description": "The 1.1.0 before-and-after comparison used matched prompts. The values below are per attempt.",
-      "methodology": "Live gpt-6.1-sol via ChatGPT sign-in. The prompt-range comparison used two attempts per task per build and includes “hello” and the large-file fix. The six hard fixes use one attempt per task in each of the two compared builds. The solve-rate table includes runs from additional builds.",
+      "methodology": "Live gpt-6.1-sol via ChatGPT sign-in. The prompt-range comparison used two attempts per task per build and includes “hello” and the large-file fix. The before-and-after table reports a separate comparison for six hard bug fixes. The solve-rate table includes runs from additional builds.",
       "note": "The report identifies the after build as 1.1.0 and leaves the exact before-build revisions unspecified. Input tokens include the prompt and context sent to the model.",
       "sources": [
         {

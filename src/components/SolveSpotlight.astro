@@ -16,17 +16,16 @@ const rows = spotlight && result?.kind === 'live-solves' ? spotlight.rows.map((i
     </figcaption>
     <div class="spotlight-plot">
       <div class="spotlight-ruler" aria-hidden="true">
-        {[0, 25, 50, 75, 100].map((value) => <span style={`--tick: ${value}%`}><span>{value}%</span></span>)}
+        {[0, 25, 50, 75, 100].map((value) => <span><span>{value}%</span></span>)}
       </div>
       <ul>
         {rows.map(({ model, harness, attempts, solved }) => {
           const rate = solveRate(solved, attempts);
           return <li>
-            <div class="spotlight-label"><strong>{model}</strong><span>{harness}</span></div>
-            <div class="spotlight-track" style={`--share: ${rate}%`}>
-              <span class="spotlight-fill" aria-hidden="true"></span>
-              <span class="spotlight-rate">{rate}%</span>
-            </div>
+            <div class="spotlight-label"><strong>{model}</strong><span>{harness}</span><strong class="spotlight-rate">{rate}%</strong></div>
+            <svg class="spotlight-track" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+              <rect class="spotlight-fill" width={rate} height="10" />
+            </svg>
             <span class="spotlight-count">{solved} of {attempts} attempts</span>
           </li>;
         })}

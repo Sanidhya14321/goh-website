@@ -1,12 +1,13 @@
 ---
+import Command from '../components/Command.astro';
 import Site from '../layouts/Site.astro';
 import { path, siteRoutes, taggedSource, upstream, userGuide } from '../lib/site';
 
 const installGuide = `${taggedSource}/README.md#install`;
-const macLinux = `curl -fsSL ${upstream}/releases/latest/download/install.sh | sh`;
+const macLinux = `curl -fL ${upstream}/releases/latest/download/install.sh -o install.sh`;
 const brew = `brew tap sanidhya14321/goh ${upstream}
 brew install sanidhya14321/goh/goh`;
-const powershell = `irm ${upstream}/releases/latest/download/install.ps1 | iex`;
+const powershell = `Invoke-WebRequest ${upstream}/releases/latest/download/install.ps1 -OutFile install.ps1`;
 const scoop = `scoop bucket add goh ${upstream}
 scoop install goh/goh`;
 ---
@@ -22,8 +23,16 @@ scoop install goh/goh`;
           <h2>Install</h2>
           <p>Use the installer for your operating system, install through Homebrew or Scoop, or <a href={path(siteRoutes.downloads) + '#cli'}>choose a direct CLI binary</a>.</p>
           <div class="command-pair">
-            <div><h3>macOS and Linux</h3><pre tabindex="0" aria-label="macOS or Linux install command"><code>{macLinux}</code></pre><h3>macOS with Homebrew</h3><pre tabindex="0" aria-label="Homebrew install commands"><code>{brew}</code></pre></div>
-            <div><h3>Windows with PowerShell</h3><pre tabindex="0" aria-label="PowerShell install command"><code>{powershell}</code></pre><h3>Windows with Scoop</h3><pre tabindex="0" aria-label="Scoop install commands"><code>{scoop}</code></pre></div>
+            <div>
+              <Command label="macOS and Linux installer download" command={macLinux} />
+              <p>Review the downloaded script, then run <code>sh ./install.sh</code>.</p>
+              <Command label="macOS with Homebrew" command={brew} />
+            </div>
+            <div>
+              <Command label="Windows PowerShell installer download" command={powershell} />
+              <p>Review the downloaded script, then run <code>.\install.ps1</code> in PowerShell.</p>
+              <Command label="Windows with Scoop" command={scoop} />
+            </div>
           </div>
         </li>
         <li>
@@ -47,11 +56,11 @@ scoop install goh/goh`;
       </ol>
       <section>
         <h2>Verify a download</h2>
-        <p>The release includes SHA-256 checksums, a CycloneDX SBOM, and GitHub build provenance. Installers check the binary’s SHA-256 before installing. The CLI binaries are unsigned. Direct browser downloads can trigger macOS quarantine or Windows SmartScreen.</p>
+        <p>The v1.1.0 release includes SHA-256 checksums and a CycloneDX SBOM. GitHub stores build attestations for the release binaries. Installers check the binary’s SHA-256 before installing. The v1.1.0 CLI binaries are unsigned. Direct browser downloads can trigger macOS quarantine or Windows SmartScreen.</p>
       </section>
       <section>
         <h2>Pin or maintain an install</h2>
-        <p>Set <code>GOH_VERSION</code> to install a specific release or <code>GOH_INSTALL_DIR</code> to change the destination. Check for updates with <code>goh upgrade --check</code>. For a package-manager install, use <code>brew upgrade goh</code> or <code>scoop update goh</code>. Run <code>goh uninstall</code> to list what will be removed. The released binary runs without a Go installation. Source builds use the pinned Go toolchain.</p>
+        <p>When using an installer script, set <code>GOH_VERSION</code> to install a specific release or <code>GOH_INSTALL_DIR</code> to change the destination. Check for updates with <code>goh upgrade --check</code>. For a package-manager install, use <code>brew upgrade goh</code> or <code>scoop update goh</code>. Run <code>goh uninstall</code> to list what will be removed. The released binary runs without a Go installation. Source builds use the pinned Go toolchain.</p>
         <ul class="text-links">
           <li><a href={installGuide}>Installation and verification</a></li>
           <li><a href={`${taggedSource}/README.md#building-from-source`}>Build from source</a></li>
