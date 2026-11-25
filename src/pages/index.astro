@@ -2,26 +2,44 @@
 import { Image } from 'astro:assets';
 import terminal from '../assets/goh-terminal.png';
 import Site from '../layouts/Site.astro';
-import BenchmarkSection from '../components/BenchmarkSection.astro';
 import Icon from '../components/Icon.astro';
-import SolveSpotlight from '../components/SolveSpotlight.astro';
-import { readBenchmarkSets } from '../lib/benchmarks';
-import { path } from '../lib/site';
+import { path, siteRoutes, taggedSource, upstream, userGuide } from '../lib/site';
 
-const sets = readBenchmarkSets(import.meta.glob('../../data/benchmarks/*.json', { eager: true, import: 'default' }));
-const latest = sets[0];
-const published = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
-const reportDate = (date: string) => published.format(new Date(date));
+const features = [
+  {
+    title: 'See the check behind a change',
+    description: 'GoHarness records whether the run changed files, which check ran, and how it finished. Configure your own test or build command and let the agent attempt a repair if it fails.',
+    link: path(siteRoutes.verification),
+    label: 'How verification works',
+  },
+  {
+    title: 'Review proposed edits and tool actions',
+    description: 'Inspect an edit’s diff or a shell command’s working directory before deciding whether to approve it. Choose how much GoHarness can do automatically in a session, project, or specific folder.',
+    link: path(siteRoutes.verification) + '#access-settings',
+    label: 'Permissions and access settings',
+  },
+  {
+    title: 'Resume work from a local journal',
+    description: 'Reopen an earlier session, branch a conversation, export a transcript, or recover readable history from a damaged journal. Interrupted tools require review before you continue.',
+    link: `${userGuide}#sessions-and-recovery`,
+    label: 'Sessions and recovery',
+  },
+  {
+    title: 'Choose how to run it',
+    description: 'Work interactively in the terminal, stream versioned events from the CLI or local HTTP API, or connect through Agent Client Protocol.',
+    link: `${taggedSource}/README.md#interfaces`,
+    label: 'GoHarness interfaces',
+  },
+];
 ---
-<Site title="GoHarness Website Beta | Local-first coding agent" description="Run GoHarness in your terminal, scripts, or editor. Explore published benchmarks and download the GoHarness CLI or Desktop Beta." page="benchmarks">
-  <section class="shell overview">
+<Site title="GoHarness | Local-first coding agent" description="Run GoHarness locally, review proposed changes, and inspect the checks behind each coding task." page="home">
+  <section class="shell overview home-overview">
     <div class="overview-copy">
-      <h1>GoHarness</h1>
-      <p class="hero-description">A local-first coding agent.</p>
-      <p class="hero-detail">Written in Go. Run it in your terminal, automate with the CLI, or connect it to your editor.</p>
+      <h1>Resolve coding tasks with checks you can inspect.</h1>
+      <p class="hero-detail">GoHarness is an open-source coding agent that runs on your machine. Open it in a terminal, run it from a script, or connect an editor through ACP. Choose a hosted model provider or a local Ollama model. Review proposed edits and see the checks behind each run’s outcome.</p>
       <div class="hero-actions">
-        <a class="button primary" href={path('downloads/')}><Icon name="download" size={19} /> Download GoHarness</a>
-        <a href="#benchmark-results">Explore the benchmarks</a>
+        <a class="button primary" href={path(siteRoutes.start)}>Get started</a>
+        <a href={path(siteRoutes.downloads) + '#cli'}>Download the CLI</a>
       </div>
     </div>
     <figure class="terminal-demo">
@@ -29,27 +47,35 @@ const reportDate = (date: string) => published.format(new Date(date));
       <Image src={terminal} widths={[480, 680, 1000, 1240]} sizes="(max-width: 768px) 100vw, 575px" alt="GoHarness terminal session showing an approved file edit and a passing verification check." loading="eager" fetchpriority="high" format="webp" />
     </figure>
   </section>
-  <div class="shell reports" id="benchmark-results">
-    <div class="evidence-intro">
-      <div>
-        <h2>Benchmark results</h2>
-        <p>See how often GoHarness solved the task, how much it sent to the model, and what the harness itself added in latency.</p>
-        <p>Every report records the model, GoHarness build, and how the run was measured.</p>
-      </div>
-      <SolveSpotlight report={latest} />
+
+  <section class="shell home-section" aria-labelledby="capabilities">
+    <h2 id="capabilities">How GoHarness works</h2>
+    <div class="feature-list">
+      {features.map(({ title, description, link, label }) => <div class="feature">
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <a href={link}>{label}</a>
+      </div>)}
     </div>
-    {sets.length > 1 && <nav class="report-archive" aria-label="Benchmark reports">
-      {sets.map((set) => <a href={`#${set.id}`}>{set.title}</a>)}
-    </nav>}
-    {sets.map((set) => <article class="benchmark-set" id={set.id} aria-labelledby={`${set.id}-title`}>
-      <header class="set-header">
-        <h3 id={`${set.id}-title`}>{set.title}</h3>
-        <time datetime={set.published}>{reportDate(set.published)}</time>
-      </header>
-      <nav class="jump-nav" aria-label={`Sections in ${set.title}`}>
-        {set.sections.map((section) => <a href={`#${set.id}-${section.id}`}>{section.title}</a>)}
-      </nav>
-      {set.sections.map((section) => <BenchmarkSection section={section} anchor={`${set.id}-${section.id}`} />)}
-    </article>)}
-  </div>
+  </section>
+
+  <section class="shell home-section home-pair" aria-label="Try GoHarness and see the benchmarks">
+    <div>
+      <h2>Review a fix from prompt to check</h2>
+      <p>Ask GoHarness to investigate a failing test. Review the proposed patch, approve it, then inspect the recorded check and outcome.</p>
+      <ul class="text-links">
+        <li><a href={`${taggedSource}/docs/images/tui-session.png`}>Session screenshot</a></li>
+        <li><a href={`${taggedSource}/docs/images/tui-approval.png`}>Approval screenshot</a></li>
+        <li><a href={`${taggedSource}/docs/images/tui-palette.png`}>Command palette screenshot</a></li>
+      </ul>
+    </div>
+    <div id="benchmark-results">
+      <h2>Benchmark results</h2>
+      <p>On seven matched prompts, mean input fell from <strong>11.9k to 9.8k tokens per attempt</strong> in the comparison for GoHarness 1.1.0. The report records the model, task sets, and how each result was measured.</p>
+      <ul class="text-links">
+        <li><a href={path(siteRoutes.benchmarks)}>See the benchmarks</a></li>
+        <li><a href={upstream}>View the source</a></li>
+      </ul>
+    </div>
+  </section>
 </Site>

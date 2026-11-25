@@ -23,24 +23,31 @@ try {
     execFileSync(process.execPath, ['node_modules/astro/bin/astro.mjs', 'build', '--outDir', out], { cwd: root, env, stdio: 'inherit' });
     const home = readFileSync(join(out, 'index.html'), 'utf8');
     const downloads = readFileSync(join(out, 'downloads/index.html'), 'utf8');
+    const start = readFileSync(join(out, 'get-started/index.html'), 'utf8');
+    const verification = readFileSync(join(out, 'verification/index.html'), 'utf8');
+    const benchmarks = readFileSync(join(out, 'benchmarks/index.html'), 'utf8');
+    assert.ok(home.includes('Resolve coding tasks with checks you can inspect.'));
+    assert.ok(start.includes('GOH_INSTALL_DIR') && start.includes('/providers') && start.includes('/models'));
+    assert.ok(verification.includes('id="access-settings"') && verification.includes('What stays on your machine'));
+    assert.ok(home.includes('11.9k to 9.8k tokens per attempt'));
     assert.ok(home.includes('Website beta') && downloads.includes('Website beta'));
     assert.ok(downloads.includes('GoHarness Desktop Beta'));
 
     assert.ok(home.includes('href="/goh-website/downloads/"'));
     assert.ok(home.includes('href="/goh-website/icon.svg"'));
     assert.ok(home.includes('/goh-website/_astro/'));
-    assert.ok(home.includes('14 (74%)') && home.includes('20 (77%)') && home.includes('56 (100%)'));
-    assert.ok(home.includes('/blob/v1.1.0/docs/BENCHMARKS.md#results'));
+    assert.ok(benchmarks.includes('14 (74%)') && benchmarks.includes('20 (77%)') && benchmarks.includes('56 (100%)'));
+    assert.ok(benchmarks.includes('/blob/v1.1.0/docs/BENCHMARKS.md#results'));
     const site = 'https://fixture-owner.github.io/goh-website';
-    for (const [html, route] of [[home, '/'], [downloads, '/downloads/']]) {
+    const pages = [[home, '/'], [start, '/get-started/'], [verification, '/verification/'], [downloads, '/downloads/'], [benchmarks, '/benchmarks/']];
+    for (const [html, route] of pages) {
       assert.ok(html.includes(`rel="canonical" href="${site}${route}"`));
       assert.ok(html.includes(`property="og:url" content="${site}${route}"`));
       assert.ok(html.includes(`property="og:image" content="${site}/social.png"`));
       assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));
     }
     const sitemap = readFileSync(join(out, 'sitemap.xml'), 'utf8');
-    assert.ok(sitemap.includes(`<loc>${site}/</loc>`));
-    assert.ok(sitemap.includes(`<loc>${site}/downloads/</loc>`));
+    for (const [, route] of pages) assert.ok(sitemap.includes(`<loc>${site}${route}</loc>`));
     assert.doesNotMatch(sitemap, /404/);
     assert.ok(readFileSync(join(out, 'robots.txt'), 'utf8').includes(`Sitemap: ${site}/sitemap.xml`));
     const notFound = readFileSync(join(out, '404.html'), 'utf8');
@@ -54,7 +61,7 @@ try {
     }
     assert.equal(downloads.includes(`${engineGitHub}/releases/download/v9.2.3/SHA256SUMS`), engineRelease);
     assert.ok(!home.includes('v9.2.3'));
-    assert.doesNotMatch(home + downloads, /<script\b|api\.github\.com/);
+    assert.doesNotMatch(pages.map(([html]) => html).join(''), /<script\b|api\.github\.com|\/Users\//);
 
     const stableBase = `https://github.com/${repo}/releases/`;
     if (state === 'complete') {

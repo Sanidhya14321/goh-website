@@ -1,0 +1,63 @@
+---
+import Site from '../layouts/Site.astro';
+import { path, siteRoutes, taggedSource, upstream, userGuide } from '../lib/site';
+
+const installGuide = `${taggedSource}/README.md#install`;
+const macLinux = `curl -fsSL ${upstream}/releases/latest/download/install.sh | sh`;
+const brew = `brew tap sanidhya14321/goh ${upstream}
+brew install sanidhya14321/goh/goh`;
+const powershell = `irm ${upstream}/releases/latest/download/install.ps1 | iex`;
+const scoop = `scoop bucket add goh ${upstream}
+scoop install goh/goh`;
+---
+<Site title="Install GoHarness and run your first task | GoHarness" description="Install the GoHarness CLI, open a project, connect a model, and run your first task." page="start">
+  <article class="shell guide">
+    <header class="guide-header">
+      <h1 class="guide-title">Install GoHarness and run your first task</h1>
+      <p>GoHarness ships as one Go binary for macOS, Linux, and Windows. Choose x86-64 or ARM64 for your system, install the CLI, and start it from the folder you want to work in.</p>
+    </header>
+    <div class="prose">
+      <ol class="setup-steps">
+        <li>
+          <h2>Install</h2>
+          <p>Use the installer for your operating system, install through Homebrew or Scoop, or <a href={path(siteRoutes.downloads) + '#cli'}>choose a direct CLI binary</a>.</p>
+          <div class="command-pair">
+            <div><h3>macOS and Linux</h3><pre tabindex="0" aria-label="macOS or Linux install command"><code>{macLinux}</code></pre><h3>macOS with Homebrew</h3><pre tabindex="0" aria-label="Homebrew install commands"><code>{brew}</code></pre></div>
+            <div><h3>Windows with PowerShell</h3><pre tabindex="0" aria-label="PowerShell install command"><code>{powershell}</code></pre><h3>Windows with Scoop</h3><pre tabindex="0" aria-label="Scoop install commands"><code>{scoop}</code></pre></div>
+          </div>
+        </li>
+        <li>
+          <h2>Open a project</h2>
+          <pre><code>{'cd your-project\ngoh'}</code></pre>
+          <p>The project browser can open that folder, a subfolder, or a recent project. Confirm folder trust when asked. Trusted folders open directly on subsequent visits. Tool permissions are still governed by your access settings.</p>
+        </li>
+        <li>
+          <h2>Connect a model</h2>
+          <p>Choose ChatGPT browser sign-in, a supported API-key provider, local Ollama, or a compatible custom endpoint. Use <code>/providers</code> to manage connections and <code>/models</code> to change the model.</p>
+          <p><a href={`${userGuide}#providers`}>Provider setup</a></p>
+        </li>
+        <li>
+          <h2>Try a read-only task</h2>
+          <p>Choose Plan and ask <strong>“Explain what this project does and tell me which command runs its tests.”</strong> Then switch to Build and ask for a scoped change. Review the diff and the check before relying on the result.</p>
+          <ul class="text-links">
+            <li><a href={`${taggedSource}/README.md#quick-start`}>Quick start</a></li>
+            <li><a href={`${userGuide}#agents-profiles-and-model-roles`}>Plan and Build</a></li>
+          </ul>
+        </li>
+      </ol>
+      <section>
+        <h2>Verify a download</h2>
+        <p>The release includes SHA-256 checksums, a CycloneDX SBOM, and GitHub build provenance. Installers check the binary’s SHA-256 before installing. The CLI binaries are unsigned. Direct browser downloads can trigger macOS quarantine or Windows SmartScreen.</p>
+      </section>
+      <section>
+        <h2>Pin or maintain an install</h2>
+        <p>Set <code>GOH_VERSION</code> to install a specific release or <code>GOH_INSTALL_DIR</code> to change the destination. Check for updates with <code>goh upgrade --check</code>. For a package-manager install, use <code>brew upgrade goh</code> or <code>scoop update goh</code>. Run <code>goh uninstall</code> to list what will be removed. The released binary runs without a Go installation. Source builds use the pinned Go toolchain.</p>
+        <ul class="text-links">
+          <li><a href={installGuide}>Installation and verification</a></li>
+          <li><a href={`${taggedSource}/README.md#building-from-source`}>Build from source</a></li>
+          <li><a href={`${taggedSource}/.github/workflows/release.yml`}>Release workflow</a></li>
+        </ul>
+      </section>
+    </div>
+  </article>
+</Site>

@@ -1,10 +1,10 @@
 ---
-import { path, siteRoutes } from '../lib/site';
+import { path, siteRoutes, type SitePage } from '../lib/site';
 
 const { title, description, page } = Astro.props as {
   title: string;
   description: string;
-  page: keyof typeof siteRoutes | 'not-found';
+  page: SitePage;
 };
 const canonical = Astro.site && page !== 'not-found' ? new URL(path(siteRoutes[page]), Astro.site) : undefined;
 const image = Astro.site && canonical ? new URL(path('social.png'), Astro.site) : undefined;

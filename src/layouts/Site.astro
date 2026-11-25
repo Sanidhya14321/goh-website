@@ -1,14 +1,20 @@
 ---
 import Metadata from '../components/Metadata.astro';
 import Icon from '../components/Icon.astro';
-import { path, upstream } from '../lib/site';
+import { path, siteRoutes, upstream, type SitePage } from '../lib/site';
 import '@fontsource/barlow/latin-400.css';
 import '@fontsource/barlow/latin-600.css';
 import '@fontsource/barlow/latin-700.css';
 import '@fontsource/barlow-condensed/latin-600.css';
 import '../styles/site.css';
 
-const { title, description, page } = Astro.props as { title: string; description: string; page: 'benchmarks' | 'downloads' | 'not-found' };
+const { title, description, page } = Astro.props as { title: string; description: string; page: SitePage };
+const navigation = [
+  { key: 'start', label: 'Get started' },
+  { key: 'downloads', label: 'Downloads' },
+  { key: 'verification', label: 'Verification' },
+  { key: 'benchmarks', label: 'Benchmarks' },
+] as const;
 ---
 <!doctype html>
 <html lang="en">
@@ -19,10 +25,9 @@ const { title, description, page } = Astro.props as { title: string; description
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="shell header-inner">
-        <a class="brand" href={path()} aria-label="GoHarness beta website home"><span class="brand-mark"><Icon name="terminal" size={19} /></span>GoHarness <span class="site-beta">Website beta</span></a>
+        <a class="brand" href={path()} aria-label="GoHarness Website beta home"><span class="brand-mark"><Icon name="terminal" size={19} /></span>GoHarness <span class="site-beta">Website beta</span></a>
         <nav aria-label="Main navigation">
-          <a href={path()} aria-current={page === 'benchmarks' ? 'page' : undefined}>Benchmarks</a>
-          <a href={path('downloads/')} aria-current={page === 'downloads' ? 'page' : undefined}>Downloads</a>
+          {navigation.map(({ key, label }) => <a href={path(siteRoutes[key])} aria-current={page === key ? 'page' : undefined}>{label}</a>)}
         </nav>
         <a class="header-repo" href={upstream} aria-label="GoHarness on GitHub"><Icon name="github" size={19} /><span>GitHub</span></a>
       </div>
@@ -32,7 +37,7 @@ const { title, description, page } = Astro.props as { title: string; description
       <div class="shell footer-inner">
         <a class="brand" href={path()}><span class="brand-mark"><Icon name="terminal" size={17} /></span>GoHarness</a>
         <div><a href={path('downloads/')}>Downloads</a><a href={upstream}>Source on GitHub</a></div>
-        <p class="site-status">Site content will be updated when the harness is complete.</p>
+        <p class="site-status">GoHarness website beta</p>
       </div>
     </footer>
   </body>

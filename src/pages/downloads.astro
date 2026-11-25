@@ -2,6 +2,7 @@
 import { readFile } from 'node:fs/promises';
 import Site from '../layouts/Site.astro';
 import Icon from '../components/Icon.astro';
+import { path, siteRoutes } from '../lib/site';
 import EngineDownloads from '../components/EngineDownloads.astro';
 import { engineGitHub } from '../lib/engine';
 import { formatBytes, packageLink } from '../lib/releases';
@@ -35,6 +36,7 @@ const platformInfo = [
   </section>
   <div class="shell downloads">
     <EngineDownloads />
+    <p class="download-help"><a href={path(siteRoutes.start)}>Install GoHarness and run your first task</a></p>
     <section class="download-section desktop-packages" id="desktop" aria-labelledby="desktop-title">
       <div class="download-section-heading">
         <div><h2 id="desktop-title">GoHarness Desktop Beta</h2><p>Standalone app for macOS, Ubuntu, and Windows. The installer includes the GoHarness engine.</p></div>

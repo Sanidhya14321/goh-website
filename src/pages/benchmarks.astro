@@ -1,0 +1,37 @@
+---
+import Site from '../layouts/Site.astro';
+import BenchmarkSection from '../components/BenchmarkSection.astro';
+import SolveSpotlight from '../components/SolveSpotlight.astro';
+import { readBenchmarkSets } from '../lib/benchmarks';
+import { taggedSource } from '../lib/site';
+
+const sets = readBenchmarkSets(import.meta.glob('../../data/benchmarks/*.json', { eager: true, import: 'default' }));
+const latest = sets[0];
+const published = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
+const reportDate = (date: string) => published.format(new Date(date));
+---
+<Site title="See how GoHarness was measured | GoHarness" description="Published GoHarness solve rates, token use, latency, and benchmark methodology." page="benchmarks">
+  <div class="shell reports" id="benchmark-results">
+    <div class="evidence-intro">
+      <div>
+        <h1 class="guide-title">See how GoHarness was measured</h1>
+        <p><code>goh-bench</code> reruns hidden checks on a clean copy of each task with the agent’s changes applied. It records solved attempts, false completions, false verification, and usage. The published runs cover synthetic bugs, real library changes, and prompts from a simple greeting to a large-file fix.</p>
+        <p><a href={`${taggedSource}/docs/BENCHMARKS.md#running`}>Benchmark methodology</a></p>
+      </div>
+      <SolveSpotlight report={latest} />
+    </div>
+    {sets.length > 1 && <nav class="report-archive" aria-label="Benchmark reports">
+      {sets.map((set) => <a href={`#${set.id}`}>{set.title}</a>)}
+    </nav>}
+    {sets.map((set) => <article class="benchmark-set" id={set.id} aria-labelledby={`${set.id}-title`}>
+      <header class="set-header">
+        <h3 id={`${set.id}-title`}>{set.title}</h3>
+        <time datetime={set.published}>{reportDate(set.published)}</time>
+      </header>
+      <nav class="jump-nav" aria-label={`Sections in ${set.title}`}>
+        {set.sections.map((section) => <a href={`#${set.id}-${section.id}`}>{section.title}</a>)}
+      </nav>
+      {set.sections.map((section) => <BenchmarkSection section={section} anchor={`${set.id}-${section.id}`} />)}
+    </article>)}
+  </div>
+</Site>
